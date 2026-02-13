@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:habit_tracker/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/habit_service.dart';
@@ -28,57 +29,15 @@ class _HomepageState extends State<Homepage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           controller.clear();
-          showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Create routine",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    TextField(
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        hintText: "Routine name",
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("Cancel"),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            final name = controller.text.trim();
-                            if (name.isEmpty) return;
-
-                            context
-                                .read<HabitService>()
-                                .add(AddHabit(title: name));
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Create"),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+          Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => BlocProvider.value(
+      value: context.read<HabitService>(),
+      child: const CreateRoutine(),
+    ),
+  ),
+);
         },
         child: Icon(Icons.add),
       ),
@@ -167,9 +126,9 @@ class _HomepageState extends State<Homepage> {
                               // );
                             },
                             child: _checklist(
-                              habit.title,
-                              () {},
-                              habit.completed,
+                              habit.name,
+                              ()=>context.read<HabitService>().add(ToggleHabit(habit.id)),
+                              habit.isActive,
                             ),
                           ),
                         ),

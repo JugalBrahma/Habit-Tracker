@@ -17,13 +17,25 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
 
       final newHabit = Habit(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: event.title,
-        completed: false,
+        name: event.title,
+       isActive: false, color: event.color, iconName: event.iconName,
+        createdAt: DateTime.now(), repeatDays: event.repeatDays,
       );
 
       final updated = [...currentState.habits, newHabit];
 
       emit(HabitLoaded(habits: updated));
     });
+
+    on<ToggleHabit>((event, emit) {
+   if (state is! HabitLoaded) return;
+    final updated = (state as HabitLoaded).habits.map((habit) {
+    if (habit.id == event.habitId) { 
+      return habit.copyWith(isActive: !habit.isActive);
+    }
+    return habit;
+   }).toList();
+   emit(HabitLoaded(habits: updated));
+});
   }
 }
