@@ -185,13 +185,13 @@ class _CreateRoutineState extends State<CreateRoutine> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isSelected ? Color(_selectedColor).withOpacity(0.2) : Colors.white,
                   border: Border.all(
                     color: isSelected ? Color(_selectedColor) : Colors.grey[300]!,
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon['icon'] as IconData, size: 24),
+                child: Icon(icon['icon'] as IconData, size: 24,color: isSelected ? Color(_selectedColor) : Colors.grey[700]),
               ),
             );
           },

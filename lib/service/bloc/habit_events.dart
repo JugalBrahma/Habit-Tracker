@@ -25,5 +25,6 @@ class AddHabit extends HabitEvents {
 }
 class ToggleHabit extends HabitEvents {
   final String habitId;
-  ToggleHabit(this.habitId);
+  final DateTime date;
+  ToggleHabit(this.habitId,this.date);
 }

@@ -11,7 +11,7 @@ class Habit {
   final TimeOfDay? reminderTime;
   final bool isActive;
   final int targetDays;
-
+final Set<DateTime> completedDates;
   Habit({
     required this.id,
     required this.name,
@@ -23,6 +23,7 @@ class Habit {
     this.reminderTime,
     this.isActive = true,
     this.targetDays = 21,
+    this.completedDates = const {},
   });
 
   Habit copyWith({
@@ -35,6 +36,7 @@ class Habit {
     TimeOfDay? reminderTime,
     bool? isActive,
     int? targetDays,
+    Set<DateTime>? completedDates,
   }) {
     return Habit(
       id: id,
@@ -47,6 +49,7 @@ class Habit {
       reminderTime: reminderTime ?? this.reminderTime,
       isActive: isActive ?? this.isActive,
       targetDays: targetDays ?? this.targetDays,
+      completedDates: completedDates ?? this.completedDates,
     );
   }
 }

@@ -29,12 +29,18 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
 
     on<ToggleHabit>((event, emit) {
    if (state is! HabitLoaded) return;
+   final day = DateTime(event.date.year, event.date.month, event.date.day);
+   
     final updated = (state as HabitLoaded).habits.map((habit) {
     if (habit.id == event.habitId) { 
-      return habit.copyWith(isActive: !habit.isActive);
+      final dates = {...habit.completedDates};
+      dates.contains(day) ? dates.remove(day) : dates.add(day);
+      return habit.copyWith(completedDates: dates);
     }
     return habit;
+
    }).toList();
+
    emit(HabitLoaded(habits: updated));
 });
   }
