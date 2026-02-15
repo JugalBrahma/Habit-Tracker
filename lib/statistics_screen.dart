@@ -4,8 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/habit_service.dart';
-import 'package:habit_tracker/service/model/user_model.dart';
-import 'package:intl/intl.dart';
+import 'package:habit_tracker/service/statistics_service.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -16,9 +15,6 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   int date = 7;
-
-  DateTime _normalize(DateTime dateTime) =>
-      DateTime(dateTime.year, dateTime.month, dateTime.day);
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +58,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final stats = _deriveStats(state.habits);
+          final stats = HabitStatisticsService.derive(
+            habits: state.habits,
+            rangeDays: date,
+          );
 
           return SingleChildScrollView(
             child: Center(
@@ -90,93 +89,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  _StatisticsSnapshot _deriveStats(List<Habit> habits) {
-    final formatter = DateFormat.E();
-    final today = _normalize(DateTime.now());
-    final start = today.subtract(Duration(days: date - 1));
-    final days = List.generate(
-      date,
-      (index) => _normalize(start.add(Duration(days: index))),
-    );
-
-    int scheduled = 0;
-    int completed = 0;
-    final List<FlSpot> spots = [];
-    final Map<DateTime, int> heatmap = {};
-    final List<_HabitBreakdown> breakdown = [];
-    _HabitStreak? bestStreak;
-
-    for (var i = 0; i < days.length; i++) {
-      final day = days[i];
-      final weekday = formatter.format(day);
-      final todaysHabits =
-          habits.where((habit) => habit.repeatDays.contains(weekday)).toList();
-      scheduled += todaysHabits.length;
-      var doneToday = 0;
-      for (final habit in todaysHabits) {
-        if (habit.completedDates.contains(day)) {
-          doneToday += 1;
-        }
-      }
-      completed += doneToday;
-      final percent = todaysHabits.isEmpty
-          ? 0.0
-          : (doneToday / todaysHabits.length * 100)
-              .clamp(0, 100)
-              .toDouble();
-      spots.add(FlSpot(i.toDouble(), percent));
-    }
-
-    for (final habit in habits) {
-      final scheduledDays = days
-          .where((day) => habit.repeatDays.contains(formatter.format(day)))
-          .length;
-      final completedDays = habit.completedDates.where((dateTime) {
-        final normalized = _normalize(dateTime);
-        return !normalized.isBefore(start) && !normalized.isAfter(today);
-      }).length;
-
-      breakdown.add(
-        _HabitBreakdown(
-          name: habit.name,
-          percent: scheduledDays == 0
-              ? 0
-              : (completedDays / scheduledDays * 100)
-                  .clamp(0, 100)
-                  .toDouble(),
-        ),
-      );
-
-      for (final date in habit.completedDates) {
-        final normalized = _normalize(date);
-        if (normalized.isBefore(start) || normalized.isAfter(today)) continue;
-        heatmap[normalized] = (heatmap[normalized] ?? 0) + 1;
-      }
-
-      final current = _currentStreak(habit, today);
-      final best = _bestStreak(habit);
-      final existingCurrent = bestStreak?.current ?? -1;
-      if (current > existingCurrent) {
-        bestStreak = _HabitStreak(habit.name, current, best);
-      }
-    }
-
-    final completionRate = scheduled == 0
-        ? 0
-        : ((completed / scheduled) * 100).round();
-
-    return _StatisticsSnapshot(
-      completionRate: completionRate,
-      completed: completed,
-      scheduled: scheduled,
-      trendSpots: spots,
-      breakdown: breakdown,
-      topStreak: bestStreak,
-      heatmapData: heatmap,
-    );
-  }
-
-  Widget _overallCard(BuildContext context, _StatisticsSnapshot snapshot) {
+  Widget _overallCard(BuildContext context, StatisticsSnapshot snapshot) {
     return Container(
       height: 200,
       decoration: BoxDecoration(
@@ -367,7 +280,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget _breakdown(
     BuildContext context,
     Color backgroundcolor,
-    List<_HabitBreakdown> breakdowns,
+    List<HabitBreakdown> breakdowns,
   ) {
   return Container(
     height: 180,
@@ -422,7 +335,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget _streak(
     BuildContext context,
     Color backgroundcolor,
-    _HabitStreak? streak,
+    HabitStreak? streak,
   ) {
   return Container(
     height: 180,
@@ -555,76 +468,4 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   );
 }
 
-  int _bestStreak(Habit habit) {
-    final sorted = habit.completedDates.map(_normalize).toList()
-      ..sort((a, b) => a.compareTo(b));
-    int best = 0;
-    int current = 0;
-    DateTime? previous;
-    for (final date in sorted) {
-      final prev = previous;
-      if (prev == null) {
-        current = 1;
-      } else {
-        final diff = date.difference(prev).inDays;
-        if (diff == 1) {
-          current += 1;
-        } else if (diff == 0) {
-          continue;
-        } else {
-          current = 1;
-        }
-      }
-      if (current > best) best = current;
-      previous = date;
-    }
-    return best;
-  }
-
-  int _currentStreak(Habit habit, DateTime referenceDate) {
-    int streak = 0;
-    DateTime cursor = referenceDate;
-
-    while (habit.completedDates.contains(cursor)) {
-      streak += 1;
-      cursor = cursor.subtract(const Duration(days: 1));
-    }
-
-    return streak;
-  }
-}
-
-class _StatisticsSnapshot {
-  final int completionRate;
-  final int completed;
-  final int scheduled;
-  final List<FlSpot> trendSpots;
-  final List<_HabitBreakdown> breakdown;
-  final _HabitStreak? topStreak;
-  final Map<DateTime, int> heatmapData;
-
-  const _StatisticsSnapshot({
-    required this.completionRate,
-    required this.completed,
-    required this.scheduled,
-    required this.trendSpots,
-    required this.breakdown,
-    required this.topStreak,
-    required this.heatmapData,
-  });
-}
-
-class _HabitBreakdown {
-  final String name;
-  final double percent;
-
-  const _HabitBreakdown({required this.name, required this.percent});
-}
-
-class _HabitStreak {
-  final String name;
-  final int current;
-  final int best;
-
-  const _HabitStreak(this.name, this.current, this.best);
 }
