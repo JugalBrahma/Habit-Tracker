@@ -2,12 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
+import 'package:habit_tracker/service/habit_repositery.dart';
 
 class HabitService extends Bloc<HabitEvents, HabitStates> {
-  HabitService() : super(HabitLoading()) {
+  final HabitRepository _repository;
+  HabitService(this._repository) : super(HabitLoading()) {
     on<LoadHabit>((event, emit) {
       // after loading, set initial list
-      emit(HabitLoaded(habits: const []));
+      emit(HabitLoaded(habits: _repository.loadHabits()));
     });
 
     on<AddHabit>((event, emit) {
