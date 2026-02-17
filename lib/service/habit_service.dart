@@ -12,38 +12,42 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
       emit(HabitLoaded(habits: _repository.loadHabits()));
     });
 
-    on<AddHabit>((event, emit) {
-      if (state is! HabitLoaded) return; // prevent crash
+    on<AddHabit>((event, emit) async {
+  if (state is! HabitLoaded) return;
+  final current = state as HabitLoaded;
 
-      final currentState = state as HabitLoaded;
+  final newHabit = Habit(
+    id: DateTime.now().millisecondsSinceEpoch.toString(),
+    name: event.title,
+    color: event.color,
+    iconName: event.iconName,
+    createdAt: DateTime.now(),
+    repeatDays: event.repeatDays,
+    description: event.description,
+    reminderTime: event.reminderTime,
+    targetDays: event.targetDays,
+  );
 
-      final newHabit = Habit(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: event.title,
-       isActive: false, color: event.color, iconName: event.iconName,
-        createdAt: DateTime.now(), repeatDays: event.repeatDays,
-      );
+  await _repository.saveHabit(newHabit);
 
-      final updated = [...currentState.habits, newHabit];
+  emit(HabitLoaded(habits: [...current.habits, newHabit]));
+});
 
-      emit(HabitLoaded(habits: updated));
-    });
+  on<ToggleHabit>((event, emit) async {
+  if (state is! HabitLoaded) return;
+  final current = state as HabitLoaded;
+  final day = DateTime(event.date.year, event.date.month, event.date.day);
 
-    on<ToggleHabit>((event, emit) {
-   if (state is! HabitLoaded) return;
-   final day = DateTime(event.date.year, event.date.month, event.date.day);
-   
-    final updated = (state as HabitLoaded).habits.map((habit) {
-    if (habit.id == event.habitId) { 
-      final dates = {...habit.completedDates};
-      dates.contains(day) ? dates.remove(day) : dates.add(day);
-      return habit.copyWith(completedDates: dates);
-    }
-    return habit;
+  final updatedHabits = current.habits.map((habit) {
+    if (habit.id != event.habitId) return habit;
+    final dates = habit.completedDateSet;
+    dates.contains(day) ? dates.remove(day) : dates.add(day);
+    final updatedHabit = habit.copyWith(completedDates: dates);
+    _repository.saveHabit(updatedHabit);
+    return updatedHabit;
+  }).toList();
 
-   }).toList();
-
-   emit(HabitLoaded(habits: updated));
+  emit(HabitLoaded(habits: updatedHabits));
 });
   }
 }

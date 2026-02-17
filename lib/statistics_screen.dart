@@ -79,6 +79,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     _streak(context, backgroundcolor, stats.topStreak),
                     const SizedBox(height: 20),
                     _activitymap(context, stats.heatmapData),
+                    const SizedBox(height: 100), // Space for floating nav bar
                   ],
                 ),
               ),
@@ -95,10 +96,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.tertiary,
-          ],
+          colors: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  Theme.of(context).colorScheme.tertiary.withOpacity(0.6),
+                ]
+              : [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.tertiary,
+                ],
         ),
       ),
       child: Row(
@@ -128,10 +134,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
                 const Text(
                   'Completion Rate',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.white),
                 ),
                 const Spacer(),
               ],
@@ -171,10 +174,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
                 const Text(
                   'Done',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.white),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -190,236 +190,151 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     Color backgroundcolor,
     List<FlSpot> spots,
   ) {
-  return Card(
-    elevation: 0,
-    margin: EdgeInsets.all(0),
-    color: backgroundcolor,
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Icon(Icons.show_chart_rounded),
-            SizedBox(width: 10),
-            Text('Trend'),
-          ],
-        ),
-        SizedBox(height: 50),
-        SizedBox(
-          height: 250,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 9),
-            child: LineChart(
-              LineChartData(
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots.isEmpty
-                        ? [FlSpot(0, 0)]
-                        : spots,
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.all(0),
+      color: backgroundcolor,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.show_chart_rounded),
+              SizedBox(width: 10),
+              Text('Trend'),
+            ],
+          ),
+          SizedBox(height: 50),
+          SizedBox(
+            height: 250,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 19.0,
+                vertical: 9,
+              ),
+              child: LineChart(
+                LineChartData(
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: spots.isEmpty ? [FlSpot(0, 0)] : spots,
 
-                    isCurved: true,
-                    color: Theme.of(context).colorScheme.primary,
-                    dotData: FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.2),
+                      isCurved: true,
+                      color: Theme.of(context).colorScheme.primary,
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.2),
+                      ),
+                    ),
+                  ],
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+
+                    rightTitles: const AxisTitles(),
+                    topTitles: const AxisTitles(),
+                    bottomTitles: const AxisTitles(),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value == 0 || value == 50 || value == 100) {
+                            return Text(
+                              '${value.toInt()}%',
+                              style: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 10,
+                              ),
+                            );
+                          }
+                          return const SizedBox();
+                        },
+                        reservedSize: 30,
+                      ),
                     ),
                   ),
-                ],
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  show: true,
-
-                  rightTitles: const AxisTitles(),
-                  topTitles: const AxisTitles(),
-                  bottomTitles: const AxisTitles(),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        if (value == 0 || value == 50 || value == 100) {
-                          return Text(
-                            '${value.toInt()}%',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 10,
-                            ),
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                      reservedSize: 30,
-                    ),
+                  minX: 0,
+                  maxX: 6,
+                  minY: 0,
+                  maxY: 100,
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 25,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: Colors.grey.withOpacity(0.1),
+                        strokeWidth: 1,
+                      );
+                    },
                   ),
-                ),
-                minX: 0,
-                maxX: 6,
-                minY: 0,
-                maxY: 100,
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 25,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Colors.grey.withOpacity(0.1),
-                      strokeWidth: 1,
-                    );
-                  },
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _breakdown(
     BuildContext context,
     Color backgroundcolor,
     List<HabitBreakdown> breakdowns,
   ) {
-  return Container(
-    height: 180,
-    decoration: BoxDecoration(
-      color: backgroundcolor,
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 20),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.pie_chart_rounded),
-              SizedBox(width: 10),
-              Text('Breakdown', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          SizedBox(height: 30),
-          ...breakdowns.map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(item.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('${item.percent.toStringAsFixed(0)}%',
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(19),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                    value: item.percent / 100,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundcolor,
+        borderRadius: BorderRadius.circular(15),
       ),
-    ),
-  );
-}
-
-  Widget _streak(
-    BuildContext context,
-    Color backgroundcolor,
-    HabitStreak? streak,
-  ) {
-  return Container(
-    height: 180,
-    decoration: BoxDecoration(
-      color: backgroundcolor,
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 20),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.local_fire_department_rounded),
-              SizedBox(width: 10),
-              Text('Streaks', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          SizedBox(height: 30),
-          if (streak == null)
-            const Text('No streak data yet')
-          else
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 20),
+        child: Column(
+          children: [
             Row(
               children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Icon(Icons.pie_chart_rounded),
+                SizedBox(width: 10),
+                Text(
+                  'Breakdown',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            Column(
+              children: [
+                ...breakdowns.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Column(
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(9),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(70),
-                                color: const Color.fromARGB(70, 216, 118, 38),
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
-                              child:
-                                  const Icon(Icons.bolt, color: Colors.deepOrange),
                             ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  streak.name,
-                                  style:
-                                      const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Best: ${streak.best} day${streak.best == 1 ? '' : 's'}',
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(73, 0, 0, 0),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              '${item.percent.toStringAsFixed(0)}%',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
-                        Column(
-                          children: [
-                            Text(
-                              '${streak.current}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            const Text(
-                              'Current',
-                              style: TextStyle(
-                                color: Color.fromARGB(73, 0, 0, 0),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(19),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.2),
+                          value: item.percent / 100,
                         ),
                       ],
                     ),
@@ -427,45 +342,171 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
               ],
             ),
-          SizedBox(height: 20),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+  Widget _streak(
+    BuildContext context,
+    Color backgroundcolor,
+    HabitStreak? streak,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundcolor,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: const [
+                Icon(Icons.local_fire_department_rounded),
+                SizedBox(width: 10),
+                Text('Streaks', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 30),
+            if (streak == null)
+              const Text('No streak data yet')
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface, // Adaptive surface
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(9),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(70),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer, // Adaptive container
+                                ),
+                                child: Icon(
+                                  Icons.bolt,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ), // Adaptive icon
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    streak.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Best: ${streak.best} day${streak.best == 1 ? '' : 's'}',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant, // Adaptive text
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                '${streak.current}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary, // Adaptive text
+                                ),
+                              ),
+                              Text(
+                                'Current',
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant, // Adaptive text
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _activitymap(BuildContext context, Map<DateTime, int> data) {
-  return Card(
-    elevation: 1,
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.calendar_month),
-              SizedBox(width: 10),
-              Text('Activity Map'),
-            ],
-          ),
-          HeatMapCalendar(
-            textColor: Colors.black54,
-            defaultColor: Colors.white,
-            flexible: true,
-            colorMode: ColorMode.color,
-            datasets: data,
-            colorsets: {
-              1: const Color(0xFFFF9800).withOpacity(0.3),
-              2: const Color(0xFFFF9800).withOpacity(0.5),
-              3: const Color(0xFFFF9800).withOpacity(0.6),
-              4: const Color(0xFFFF9800).withOpacity(0.9),
-            },
-            onClick: (_) {},
-          ),
-        ],
+    return Card(
+      elevation: 0, // Removed elevation to match style
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainer, // Adaptive background
+      child: Padding(
+        padding: const EdgeInsets.all(16.0), // Increased padding
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.calendar_month),
+                SizedBox(width: 10),
+                Text(
+                  'Activity Map',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Added spacing
+            HeatMapCalendar(
+              textColor: Theme.of(
+                context,
+              ).colorScheme.onSurface, // Adaptive text
+              defaultColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest, // Adaptive empty cells
+              flexible: true,
+              colorMode: ColorMode.color,
+              datasets: data,
+              colorsets: {
+                1: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                2: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                3: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                4: Theme.of(
+                  context,
+                ).colorScheme.primary, // Use primary theme color
+              },
+              onClick: (_) {},
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 }
