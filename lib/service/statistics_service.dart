@@ -54,7 +54,7 @@ class HabitStatisticsService {
         return !normalized.isBefore(start) && !normalized.isAfter(today);
       }).length;
 
-      breakdown.add(
+      breakdown. add(
         HabitBreakdown(
           name: habit.name,
           percent: scheduledDays == 0
@@ -73,6 +73,9 @@ class HabitStatisticsService {
 
       final current = _currentStreak(habit, today);
       final best = _bestStreak(habit);
+      if (current == 0 && best == 0) {
+        continue;
+      }
       final existingCurrent = bestStreak?.current ?? -1;
       if (current > existingCurrent) {
         bestStreak = HabitStreak(habit.name, current, best);
