@@ -27,8 +27,9 @@ class HabitStatisticsService {
     for (var i = 0; i < days.length; i++) {
       final day = days[i];
       final weekday = formatter.format(day);
-      final todaysHabits =
-          habits.where((habit) => habit.repeatDays.contains(weekday)).toList();
+      final todaysHabits = habits
+          .where((habit) => habit.repeatDays.contains(weekday))
+          .toList();
       scheduled += todaysHabits.length;
       var doneToday = 0;
       for (final habit in todaysHabits) {
@@ -39,9 +40,7 @@ class HabitStatisticsService {
       completed += doneToday;
       final percent = todaysHabits.isEmpty
           ? 0.0
-          : (doneToday / todaysHabits.length * 100)
-              .clamp(0, 100)
-              .toDouble();
+          : (doneToday / todaysHabits.length * 100).clamp(0, 100).toDouble();
       spots.add(FlSpot(i.toDouble(), percent));
     }
 
@@ -54,14 +53,12 @@ class HabitStatisticsService {
         return !normalized.isBefore(start) && !normalized.isAfter(today);
       }).length;
 
-      breakdown. add(
+      breakdown.add(
         HabitBreakdown(
           name: habit.name,
           percent: scheduledDays == 0
               ? 0
-              : (completedDays / scheduledDays * 100)
-                  .clamp(0, 100)
-                  .toDouble(),
+              : (completedDays / scheduledDays * 100).clamp(0, 100).toDouble(),
         ),
       );
 
@@ -84,7 +81,7 @@ class HabitStatisticsService {
 
     final completionRate = scheduled == 0
         ? 0
-        : ((completed / scheduled) * 100).round();
+        : ((completed / scheduled) * 100).clamp(0, 100).round();
 
     return StatisticsSnapshot(
       completionRate: completionRate,

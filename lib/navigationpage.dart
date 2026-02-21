@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/homepage.dart';
-import 'package:habit_tracker/statistics_screen.dart';
+import 'package:habit_tracker/screens/homepage.dart';
+import 'package:habit_tracker/screens/statistics_screen.dart';
 
 class Navigationpage extends StatefulWidget {
   const Navigationpage({super.key});
