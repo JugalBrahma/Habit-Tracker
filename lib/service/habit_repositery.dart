@@ -3,11 +3,15 @@ import 'model/user_model.dart';
 
 class HabitRepository {
   static const _boxName = 'Habits';
-  final Box _box = Hive.box(_boxName);
+  final Box? _box;
 
-  List<Habit> loadHabits() => _box.values.cast<Habit>().toList();
+  HabitRepository([this._box]);
 
-  Future<void> saveHabit(Habit habit) => _box.put(habit.id, habit);
+  Box get box => _box ?? Hive.box(_boxName);
 
-  Future<void> deleteHabit(String id) => _box.delete(id);
+  List<Habit> loadHabits() => box.values.cast<Habit>().toList();
+
+  Future<void> saveHabit(Habit habit) => box.put(habit.id, habit);
+
+  Future<void> deleteHabit(String id) => box.delete(id);
 }

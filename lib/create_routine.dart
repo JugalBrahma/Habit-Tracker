@@ -61,11 +61,16 @@ class _CreateRoutineState extends State<CreateRoutine> {
   TimeOfDay? _reminderTime;
 
   @override
+  void dispose() {
+    habitname.dispose();
+    description.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Create Routine"),
-      ),
+      appBar: AppBar(title: Text("Create Routine")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -98,19 +103,31 @@ class _CreateRoutineState extends State<CreateRoutine> {
               SizedBox(height: 10),
               _buildColorPicker(),
               SizedBox(height: 20),
-              Text("Icon", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                "Icon",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
               _buildIconPicker(),
               SizedBox(height: 20),
-              Text('Repeat Days', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                'Repeat Days',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
               _buildRepeatDays(),
               SizedBox(height: 20),
-              Text('Reminder Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                'Reminder Time',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 20),
               _buildReminderTile(),
               SizedBox(height: 20),
-              Text('Target Duration', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                'Target Duration',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
               _buildGoalDays(),
               SizedBox(height: 40),
@@ -146,8 +163,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
                   : null,
             ),
             child: isSelected
-                    ? const Icon(Icons.check, color: Colors.white)
-                    : null,
+                ? const Icon(Icons.check, color: Colors.white)
+                : null,
           ),
         );
       }).toList(),
@@ -185,13 +202,21 @@ class _CreateRoutineState extends State<CreateRoutine> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(_selectedColor).withOpacity(0.2) : Colors.white,
+                  color: isSelected
+                      ? Color(_selectedColor).withOpacity(0.2)
+                      : Colors.white,
                   border: Border.all(
-                    color: isSelected ? Color(_selectedColor) : Colors.grey[300]!,
+                    color: isSelected
+                        ? Color(_selectedColor)
+                        : Colors.grey[300]!,
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon['icon'] as IconData, size: 24,color: isSelected ? Color(_selectedColor) : Colors.grey[700]),
+                child: Icon(
+                  icon['icon'] as IconData,
+                  size: 24,
+                  color: isSelected ? Color(_selectedColor) : Colors.grey[700],
+                ),
               ),
             );
           },
@@ -323,27 +348,31 @@ class _CreateRoutineState extends State<CreateRoutine> {
     return GestureDetector(
       onTap: () {
         final title = habitname.text.trim();
-      if (title.isEmpty) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Enter a habit name before saving')));
-  return;
-}
- 
-if (_selectedIconName.isEmpty) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pick an icon for this habit')));
-  return;
-}
- 
+        if (title.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Enter a habit name before saving')),
+          );
+          return;
+        }
+
+        if (_selectedIconName.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Pick an icon for this habit')),
+          );
+          return;
+        }
+
         context.read<HabitService>().add(
-              AddHabit(
-                title: title,
-                description: description.text.trim(),
-                color: _selectedColor,
-                iconName: _selectedIconName,
-                repeatDays: _selectedRepeatDays.toList(),
-                reminderTime: _reminderTime,
-                targetDays: _targetDays.round(),
-              ),
-            );
+          AddHabit(
+            title: title,
+            description: description.text.trim(),
+            color: _selectedColor,
+            iconName: _selectedIconName,
+            repeatDays: _selectedRepeatDays.toList(),
+            reminderTime: _reminderTime,
+            targetDays: _targetDays.round(),
+          ),
+        );
         Navigator.pop(context);
       },
       child: Center(

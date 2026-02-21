@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/theme/theme_cubit.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
@@ -37,6 +37,12 @@ class _HomepageState extends State<Homepage> {
     'Computer': Icons.computer,
   };
   DateTime _selectedDate = DateTime.now();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -494,10 +500,32 @@ class _HomepageState extends State<Homepage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Image.asset(
-                  'assets/app_Icon/app_logo.png',
-                  width: 80,
-                  height: 80,
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ClipOval(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        color: Colors.white.withOpacity(0.2),
+                        child: Transform.scale(
+                          scale: 1,
+                          child: Image.asset(
+                            'assets/app_logo/app_logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        //border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -571,52 +599,221 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  // Future<void> _sendEmail(String userEmail, String feedback) async {
+  //   final String subject = Uri.encodeComponent('Habit Tracker Feedback');
+  //   final String body = Uri.encodeComponent(
+  //     'From: $userEmail\n\nFeedback:\n$feedback',
+  //   );
+  //   final Uri mailUri = Uri.parse(
+  //     'mailto:support@habittracker.com?subject=$subject&body=$body',
+  //   );
+
+  //   try {
+  //     if (await canLaunchUrl(mailUri)) {
+  //       await launchUrl(mailUri);
+  //     } else {
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Could not launch email app')),
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(
+  //         context,
+  //       ).showSnackBar(SnackBar(content: Text('Error: $e')));
+  //     }
+  //   }
+  // }
+
   void _showFeedbackDialog() {
-    final feedbackController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Send Feedback'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'We\'d love to hear your thoughts!',
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: feedbackController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: 'Share your feedback here...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+      builder: (context) {
+        final emailController = TextEditingController();
+        final feedbackController = TextEditingController();
+        final formKey = GlobalKey<FormState>();
+        final FirebaseFirestore firebasestore = FirebaseFirestore.instance;
+
+        void sendfeedback() {
+          try {
+            firebasestore.collection('feedback').add({
+              'email': emailController.text,
+              'feedback': feedbackController.text,
+            });
+          } catch (e) {
+            debugPrint(e.toString());
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to send feedback')),
+            );
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Feedback sent successfully')),
+          );
+
+          emailController.clear();
+          feedbackController.clear();
+
+          Navigator.pop(context);
+        }
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.tertiary,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.feedback_rounded, color: Colors.white, size: 28),
+                    SizedBox(width: 16),
+                    Text(
+                      'Send Feedback',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              // In a real app, you would send this to a backend
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Thank you for your feedback!'),
-                  behavior: SnackBarBehavior.floating,
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'We\'d love to hear your thoughts!',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Your Email',
+                          hintText: 'Enter your email for replies',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withOpacity(0.3),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: feedbackController,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          labelText: 'Feedback Details',
+                          hintText:
+                              'Share your suggestions or report issues...',
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(bottom: 80),
+                            child: Icon(Icons.description_outlined),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withOpacity(0.3),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please share your feedback';
+                          }
+                          if (value.length < 10) {
+                            return 'Feedback is too short';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            },
-            child: const Text('Send'),
-          ),
-        ],
-      ),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    emailController.dispose();
+                    feedbackController.dispose();
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      sendfeedback();
+                      emailController.dispose();
+                      feedbackController.dispose();
+                    }
+                  },
+                  icon: const Icon(Icons.send_rounded),
+                  label: const Text('Send'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

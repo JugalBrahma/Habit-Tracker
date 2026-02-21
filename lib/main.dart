@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/firebase_options.dart';
 import 'package:habit_tracker/theme/app_theme.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/navigationpage.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
@@ -13,6 +14,7 @@ import 'package:habit_tracker/theme/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox('Habits');
