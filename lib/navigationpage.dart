@@ -13,6 +13,7 @@ class _NavigationpageState extends State<Navigationpage> {
   int _selectedindex = 0;
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: true,
@@ -50,7 +51,7 @@ class _NavigationpageState extends State<Navigationpage> {
                       elevation: 0,
                       labelBehavior:
                           NavigationDestinationLabelBehavior.alwaysHide,
-                      height: 60,
+                      height: size.height * 0.08,
                       onDestinationSelected: (value) {
                         setState(() {
                           _selectedindex = value;

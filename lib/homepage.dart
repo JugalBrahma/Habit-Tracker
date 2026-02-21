@@ -46,20 +46,21 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final startDate = today.subtract(const Duration(days: 3));
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: _buildDrawer(),
+      drawer: _buildDrawer(size),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(),
             const SizedBox(height: 20),
-            _buildDateSelector(startDate),
+            _buildDateSelector(startDate, size),
             const SizedBox(height: 20),
             Expanded(
               child: BlocBuilder<HabitService, HabitStates>(
@@ -109,7 +110,7 @@ class _HomepageState extends State<Homepage> {
                     }
                     return Column(
                       children: [
-                        _buildProgressCard(doneToday, totalToday),
+                        _buildProgressCard(doneToday, totalToday, size),
                         const SizedBox(height: 20),
                         Expanded(
                           child: ListView.separated(
@@ -216,9 +217,9 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Widget _buildDateSelector(DateTime startDate) {
+  Widget _buildDateSelector(DateTime startDate, Size size) {
     return SizedBox(
-      height: 85,
+      height: size.height * 0.1,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -239,7 +240,7 @@ class _HomepageState extends State<Homepage> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 6),
-              width: 55,
+              width: size.width * 0.14,
               decoration: BoxDecoration(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
@@ -290,11 +291,12 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Widget _buildProgressCard(int done, int total) {
+  Widget _buildProgressCard(int done, int total, Size size) {
     double progress = total > 0 ? done / total : 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
+        height: size.height * 0.24,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
@@ -481,7 +483,7 @@ class _HomepageState extends State<Homepage> {
     return streak;
   }
 
-  Widget _buildDrawer() {
+  Widget _buildDrawer(Size size) {
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: ListView(
@@ -505,8 +507,8 @@ class _HomepageState extends State<Homepage> {
                   children: [
                     ClipOval(
                       child: Container(
-                        width: 72,
-                        height: 72,
+                        width: size.width * 0.18,
+                        height: size.width * 0.18,
                         color: Colors.white.withOpacity(0.2),
                         child: Transform.scale(
                           scale: 1,
@@ -518,8 +520,8 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                     Container(
-                      width: 72,
-                      height: 72,
+                      width: size.width * 0.18,
+                      height: size.width * 0.18,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         //border: Border.all(color: Colors.white, width: 2),
@@ -538,32 +540,6 @@ class _HomepageState extends State<Homepage> {
                 ),
               ],
             ),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.home_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            title: Text(
-              'Home',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.bar_chart_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            title: Text(
-              'Statistics',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
           ),
           const Divider(),
           ListTile(

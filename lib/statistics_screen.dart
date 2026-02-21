@@ -18,6 +18,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     Color backgroundcolor = Theme.of(context).colorScheme.surfaceContainer;
     return Scaffold(
       appBar: AppBar(
@@ -70,9 +71,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    _overallCard(context, stats),
+                    _overallCard(context, stats, size),
                     const SizedBox(height: 20),
-                    _chart(context, backgroundcolor, stats.trendSpots),
+                    _chart(context, backgroundcolor, stats.trendSpots, size),
                     const SizedBox(height: 20),
                     _breakdown(context, backgroundcolor, stats.breakdown),
                     const SizedBox(height: 20),
@@ -90,9 +91,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _overallCard(BuildContext context, StatisticsSnapshot snapshot) {
+  Widget _overallCard(
+    BuildContext context,
+    StatisticsSnapshot snapshot,
+    Size size,
+  ) {
     return Container(
-      height: 200,
+      height: size.height * 0.24,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         gradient: LinearGradient(
@@ -146,8 +151,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  height: 20,
-                  width: 95,
+                  height: size.height * 0.025,
+                  width: size.width * 0.24,
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(31, 255, 255, 255),
                     borderRadius: BorderRadius.circular(15),
@@ -189,6 +194,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     BuildContext context,
     Color backgroundcolor,
     List<FlSpot> spots,
+    Size size,
   ) {
     return Card(
       elevation: 0,
@@ -205,7 +211,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
           SizedBox(height: 50),
           SizedBox(
-            height: 250,
+            height: size.height * 0.3,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 19.0,

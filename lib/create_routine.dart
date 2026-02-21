@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
@@ -69,6 +67,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(title: Text("Create Routine")),
       body: Padding(
@@ -101,14 +100,14 @@ class _CreateRoutineState extends State<CreateRoutine> {
               SizedBox(height: 20),
               Text('Color'),
               SizedBox(height: 10),
-              _buildColorPicker(),
+              _buildColorPicker(size),
               SizedBox(height: 20),
               Text(
                 "Icon",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              _buildIconPicker(),
+              _buildIconPicker(size),
               SizedBox(height: 20),
               Text(
                 'Repeat Days',
@@ -129,9 +128,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              _buildGoalDays(),
+              _buildGoalDays(size),
               SizedBox(height: 40),
-              _buildCreateHabitButton(),
+              _buildCreateHabitButton(size),
             ],
           ),
         ),
@@ -139,7 +138,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
     );
   }
 
-  Widget _buildColorPicker() {
+  Widget _buildColorPicker(Size size) {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
@@ -153,8 +152,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
             });
           },
           child: Container(
-            width: 44,
-            height: 44,
+            width: size.width * 0.11,
+            height: size.width * 0.11,
             decoration: BoxDecoration(
               color: Color(value),
               shape: BoxShape.circle,
@@ -171,9 +170,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
     );
   }
 
-  Widget _buildIconPicker() {
+  Widget _buildIconPicker(Size size) {
     return Container(
-      height: 250,
+      height: size.height * 0.3,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(15),
@@ -295,8 +294,9 @@ class _CreateRoutineState extends State<CreateRoutine> {
     );
   }
 
-  Widget _buildGoalDays() {
+  Widget _buildGoalDays(Size size) {
     return Container(
+      height: size.height * 0.12,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -344,7 +344,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
     );
   }
 
-  Widget _buildCreateHabitButton() {
+  Widget _buildCreateHabitButton(Size size) {
     return GestureDetector(
       onTap: () {
         final title = habitname.text.trim();
@@ -377,7 +377,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
       },
       child: Center(
         child: Container(
-          height: 60,
+          height: size.height * 0.07,
           width: double.infinity,
           decoration: BoxDecoration(
             color: Color(_selectedColor),
