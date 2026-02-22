@@ -66,13 +66,46 @@ class StatsActivityMap extends StatelessWidget {
             colorMode: ColorMode.color,
             datasets: data,
             colorsets: {
-              1: theme.colorScheme.primary.withOpacity(0.2),
-              2: theme.colorScheme.primary.withOpacity(0.4),
-              3: theme.colorScheme.primary.withOpacity(0.6),
-              4: theme.colorScheme.primary.withOpacity(0.8),
-              5: theme.colorScheme.primary,
+              1: Colors.orange.withOpacity(0.2),
+              2: Colors.orange.withOpacity(0.4),
+              3: Colors.orange.withOpacity(0.6),
+              4: Colors.orange.withOpacity(0.8),
+              5: Colors.orange,
             },
             onClick: (_) {},
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'Less',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ...List.generate(5, (index) {
+                return Container(
+                  margin: const EdgeInsets.only(right: 4),
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.2 * (index + 1)),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                );
+              }),
+              const SizedBox(width: 4),
+              Text(
+                'More',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ),
+            ],
           ),
         ],
       ),
