@@ -256,140 +256,186 @@ class HomeDrawer extends StatelessWidget {
         final formKey = GlobalKey<FormState>();
         final FirebaseFirestore firebasestore = FirebaseFirestore.instance;
 
-        void sendfeedback() {
+        Future<void> sendfeedback() async {
           try {
-            firebasestore.collection('feedback').add({
+            await firebasestore.collection('feedback').add({
               'email': emailController.text,
               'feedback': feedbackController.text,
               'timestamp': FieldValue.serverTimestamp(),
             });
-          } catch (e) {
-            debugPrint(e.toString());
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to send feedback')),
-            );
-            return;
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Feedback sent! Thank you for your support.'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
 
-          emailController.dispose();
-          feedbackController.dispose();
-          Navigator.pop(context);
+            if (!context.mounted) return;
+
+            // Show success snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Feedback sent! Thank you for your support.'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+
+            // Close dialog immediately
+            if (!context.mounted) return;
+            Navigator.pop(context);
+          } catch (e, s) {
+            // Ignore non-critical Google Play Services errors
+            if (e.toString().contains('SecurityException') ||
+                e.toString().contains('GoogleApiManager')) {
+              debugPrint(
+                'Non-critical GMS error (data may still be saved): $e',
+              );
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Feedback sent! Thank you for your support.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              return;
+            }
+
+            // Handle critical errors
+            debugPrint('sendFeedback error: $e');
+            debugPrint(s.toString());
+
+            if (!context.mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to send feedback: ${e.toString()}'),
+              ),
+            );
+          }
         }
 
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          titlePadding: EdgeInsets.zero,
-          title: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.tertiary,
-                ],
-              ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
-              ),
+        return WillPopScope(
+          onWillPop: () async {
+            emailController.dispose();
+            feedbackController.dispose();
+            return true;
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-            child: const Row(
-              children: [
-                Icon(Icons.auto_awesome, color: Colors.white, size: 28),
-                SizedBox(width: 16),
-                Text(
-                  'Your Feedback',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.tertiary,
+                  ],
                 ),
-              ],
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: const Row(
                 children: [
-                  const Text(
-                    'Help us grow! Share your ideas, report bugs, or just say hello. Your input directly shapes the future of this app.',
-                    style: TextStyle(fontSize: 14, height: 1.4),
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Contact Email',
-                      prefixIcon: const Icon(Icons.alternate_email_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      filled: true,
+                  Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+                  SizedBox(width: 16),
+                  Text(
+                    'Your Feedback',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Required for follow-up';
-                      }
-                      if (!value.contains('@')) return 'Invalid email';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: feedbackController,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: 'Message',
-                      hintText: 'What\'s on your mind?',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      filled: true,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a message';
-                      }
-                      return null;
-                    },
                   ),
                 ],
               ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Maybe Later'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  sendfeedback();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            content: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Help us grow! Share your ideas, report bugs, or just say hello. Your input directly shapes the future of this app.',
+                      style: TextStyle(fontSize: 14, height: 1.4),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Contact Email',
+                        prefixIcon: const Icon(Icons.alternate_email_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        filled: true,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Required for follow-up';
+                        }
+                        if (!value.contains('@')) return 'Invalid email';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: feedbackController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        labelText: 'Message',
+                        hintText: 'What\'s on your mind?',
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        filled: true,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a message';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
               ),
-              child: const Text('Send Feedback'),
             ),
-          ],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Maybe Later'),
+              ),
+              TextButton(
+                onPressed: () {
+                  formKey.currentState!.reset();
+                  emailController.clear();
+                  feedbackController.clear();
+                },
+                child: const Text('Restart'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    sendfeedback();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Send Feedback'),
+              ),
+            ],
+          ),
         );
       },
     );

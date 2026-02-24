@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+    
+    // Helper to validate email format
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    // Feedback collection - allow anyone to submit feedback
+    match /feedback/{document=**} {
+      // Allow read only to authenticated users (admin purposes)
+      allow read: if isAuth();
+      
+      // Allow anonymous users to create feedback (no auth required)
+      allow create: if 
+        request.resource.data.keys().hasAll(['email', 'feedback', 'timestamp']) &&
+        isValidEmail(request.resource.data.email) &&
+        request.resource.data.feedback.size() > 0 &&
+        request.resource.data.feedback.size() <= 5000 &&
+        request.resource.data.email.size() <= 255;
+      
+      // Deny updates and deletes
+      allow update, delete: if false;
+    }
+
+    // Users collection (if needed for future features)
+    match /users/{userId} {
+      allow read, write: if isAuth() && request.auth.uid == userId;
+    }
+
+    // Habits collection (if used in future)
+    match /habits/{document=**} {
+      allow read, write: if isAuth();
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
