@@ -14,10 +14,29 @@ import 'package:habit_tracker/theme/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await Hive.initFlutter();
-  Hive.registerAdapter(HabitAdapter());
-  await Hive.openBox('Habits');
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Firebase initialization error: $e');
+    // Continue without Firebase for offline functionality
+  }
+
+  try {
+    await Hive.initFlutter();
+    Hive.registerAdapter(HabitAdapter());
+    await Hive.openBox('Habits');
+    await Hive.openBox('themePreferences');
+    print('Hive initialized successfully');
+  } catch (e) {
+    print('Hive initialization error: $e');
+    // Exit if local storage fails
+    return;
+  }
+
   final repo = HabitRepository();
 
   runApp(
@@ -28,11 +47,15 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final HabitRepository repo;
   const MyApp({super.key, required this.repo});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeMode>(
@@ -43,7 +66,7 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
           home: BlocProvider(
-            create: (context) => HabitService(repo)..add(LoadHabit()),
+            create: (context) => HabitService(widget.repo)..add(LoadHabit()),
             child: Navigationpage(),
           ),
         );

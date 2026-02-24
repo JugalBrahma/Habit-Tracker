@@ -16,21 +16,25 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
       if (state is! HabitLoaded) return;
       final current = state as HabitLoaded;
 
-      final newHabit = Habit(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: event.title,
-        color: event.color,
-        iconName: event.iconName,
-        createdAt: DateTime.now(),
-        repeatDays: event.repeatDays,
-        description: event.description,
-        reminderTime: event.reminderTime,
-        targetDays: event.targetDays,
-      );
+      try {
+        final newHabit = Habit(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          name: event.title,
+          color: event.color,
+          iconName: event.iconName,
+          createdAt: DateTime.now(),
+          repeatDays: event.repeatDays,
+          description: event.description,
+          reminderTime: event.reminderTime,
+          targetDays: event.targetDays,
+        );
 
-      await _repository.saveHabit(newHabit);
-
-      emit(HabitLoaded(habits: [...current.habits, newHabit]));
+        await _repository.saveHabit(newHabit);
+        emit(HabitLoaded(habits: [...current.habits, newHabit]));
+      } catch (e) {
+        print('Error adding habit: $e');
+        // Continue with current state if save fails
+      }
     });
 
     on<ToggleHabit>((event, emit) async {

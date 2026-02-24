@@ -158,8 +158,8 @@ class HomeHabitTile extends StatelessWidget {
                                 decoration: isDone
                                     ? TextDecoration.lineThrough
                                     : null,
-                                decorationColor: theme.colorScheme.onSurface
-                                    .withOpacity(0.4),
+                                decorationColor: theme.colorScheme.onSurface,
+                                decorationThickness: 2.5,
                               ),
                             ),
                             const SizedBox(height: 4),

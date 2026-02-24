@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Indigo color scheme
+  //theme.colorScheme.onSurface
   static const Color primarySeed = Color(0xFF3F51B5); // Indigo for light theme
   static const Color primarySeedDark = Color(
     0xFF5C6BC0,
