@@ -1,4 +1,4 @@
-package com.example.habit_tracker
+package app.creativeapps.habittracker
 
 import io.flutter.embedding.android.FlutterActivity
 

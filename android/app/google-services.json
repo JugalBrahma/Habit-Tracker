@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:717582476550:android:a416cb9a0dbf8f3928aa87",
+        "android_client_info": {
+          "package_name": "app.creativeapps.habittracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7P4GCYJVpoBKYDyE8lthlaHSgkNPVcWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:717582476550:android:2e7cd2d4620b1aae28aa87",
         "android_client_info": {
           "package_name": "com.example.habit_tracker"
