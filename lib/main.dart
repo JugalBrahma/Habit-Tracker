@@ -48,7 +48,7 @@ void main() async {
     }
 
     // Critical error - show error page
-    debugPrint('🔴 Critical Error: $errorString');
+    debugPrint('Critical Error: $errorString');
     debugPrint('Stack: $stackTrace');
     runApp(
       ErrorPage(
