@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/service/statistics_service.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
 
 class StatsOverallCard extends StatelessWidget {
   final StatisticsSnapshot snapshot;

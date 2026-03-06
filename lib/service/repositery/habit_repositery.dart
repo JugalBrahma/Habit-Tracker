@@ -1,5 +1,5 @@
+import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:hive/hive.dart';
-import 'model/user_model.dart';
 
 class HabitRepository {
   static const _boxName = 'Habits';

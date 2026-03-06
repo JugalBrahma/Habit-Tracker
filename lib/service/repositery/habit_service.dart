@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
-import 'package:habit_tracker/service/habit_repositery.dart';
+import 'package:habit_tracker/service/repositery/habit_repositery.dart';
 
 class HabitService extends Bloc<HabitEvents, HabitStates> {
   final HabitRepository _repository;

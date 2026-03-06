@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
-import 'package:habit_tracker/service/habit_service.dart';
-import 'package:habit_tracker/service/statistics_service.dart';
+import 'package:habit_tracker/service/repositery/habit_service.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_overall_card.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_activity_trend.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_habit_breakdown.dart';

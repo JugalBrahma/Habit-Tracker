@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
-import 'package:habit_tracker/service/statistics_service.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
 
 void main() {
   group('Statistics unit testing', () {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/service/statistics_service.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
 
 class StatsHabitBreakdown extends StatelessWidget {
   final List<HabitBreakdown> breakdowns;

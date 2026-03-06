@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/screens/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
-import 'package:habit_tracker/service/habit_service.dart';
+import 'package:habit_tracker/service/repositery/habit_service.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_header.dart';

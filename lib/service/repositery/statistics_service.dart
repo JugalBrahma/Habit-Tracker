@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
-import 'model/user_model.dart';
+import '../model/user_model.dart';
 
 class HabitStatisticsService {
   static StatisticsSnapshot derive({
