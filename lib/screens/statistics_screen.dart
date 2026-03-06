@@ -101,12 +101,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             rangeDays: date,
           );
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 16,
-              ),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = constraints.maxWidth > 600;
+              final horizontalPadding = isTablet ? 40.0 : 24.0;
+              
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: 16,
+                  ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -145,7 +150,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
           );
         },
-      ),
-    );
-  }
+      );
+   } )
+  );}
 }

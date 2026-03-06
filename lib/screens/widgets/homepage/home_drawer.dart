@@ -7,6 +7,9 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+    final avatarSize = isTablet ? 80.0 : size.width * 0.18;
+    
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: ListView(
@@ -30,9 +33,9 @@ class HomeDrawer extends StatelessWidget {
                   children: [
                     ClipOval(
                       child: Container(
-                        width: size.width * 0.18,
-                        height: size.width * 0.18,
-                        color: Colors.white.withOpacity(0.2),
+                        width: avatarSize,
+                        height: avatarSize,
+                        color: Colors.white.withValues(alpha: 0.2),
                         child: Transform.scale(
                           scale: 1,
                           child: Image.asset(
@@ -43,8 +46,8 @@ class HomeDrawer extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      width: size.width * 0.18,
-                      height: size.width * 0.18,
+                      width: avatarSize,
+                      height: avatarSize,
                       decoration: const BoxDecoration(shape: BoxShape.circle),
                     ),
                   ],

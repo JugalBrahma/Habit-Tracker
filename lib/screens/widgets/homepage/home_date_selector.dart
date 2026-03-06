@@ -16,8 +16,12 @@ class HomeDateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+    final itemWidth = isTablet ? 80.0 : size.width * 0.14;
+    final containerHeight = isTablet ? 100.0 : size.height * 0.1;
+    
     return SizedBox(
-      height: size.height * 0.1,
+      height: containerHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -34,7 +38,11 @@ class HomeDateSelector extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 6),
-              width: size.width * 0.14,
+              width: itemWidth,
+              constraints: BoxConstraints(
+                minWidth: 60.0,
+                maxWidth: isTablet ? 100.0 : double.infinity,
+              ),
               decoration: BoxDecoration(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary

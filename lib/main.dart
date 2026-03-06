@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habit_tracker/firebase_options.dart';
 import 'package:habit_tracker/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +15,14 @@ import 'package:habit_tracker/theme/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Lock orientation to prevent crashes
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   // Smart error handler - shows user-friendly messages
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -27,7 +36,7 @@ void main() async {
         errorString.contains('was used after being disposed') ||
         errorString.contains('TextEditingController') ||
         errorString.contains('Tried to build dirty widget')) {
-      debugPrint('⚠️ Non-critical widget error (ignored): $errorString');
+      debugPrint('Non-critical widget error (ignored): $errorString');
       return;
     }
 

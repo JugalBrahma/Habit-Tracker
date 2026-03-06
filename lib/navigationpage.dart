@@ -11,9 +11,13 @@ class Navigationpage extends StatefulWidget {
 
 class _NavigationpageState extends State<Navigationpage> {
   int _selectedindex = 0;
+  
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+    final navBarHeight = isTablet ? 80.0 : size.height * 0.08;
+    
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: true,
@@ -26,9 +30,18 @@ class _NavigationpageState extends State<Navigationpage> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: EdgeInsets.fromLTRB(
+                isTablet ? 40.0 : 20.0, 
+                0, 
+                isTablet ? 40.0 : 20.0, 
+                isTablet ? 40.0 : 20.0
+              ),
               child: SafeArea(
                 child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: navBarHeight,
+                    minHeight: 60.0,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(25),
@@ -51,7 +64,7 @@ class _NavigationpageState extends State<Navigationpage> {
                       elevation: 0,
                       labelBehavior:
                           NavigationDestinationLabelBehavior.alwaysHide,
-                      height: size.height * 0.08,
+                      height: navBarHeight,
                       onDestinationSelected: (value) {
                         setState(() {
                           _selectedindex = value;
