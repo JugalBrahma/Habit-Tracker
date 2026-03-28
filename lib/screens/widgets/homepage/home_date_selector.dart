@@ -16,18 +16,24 @@ class HomeDateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
     final isTablet = size.width > 600;
-    final itemWidth = isTablet ? 80.0 : size.width * 0.14;
-    final containerHeight = isTablet ? 100.0 : size.height * 0.1;
-    
-    return SizedBox(
-      height: containerHeight,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: 7,
-        itemBuilder: (context, index) {
-          final date = startDate.add(Duration(days: index));
+    final itemWidth = isTablet
+        ? 80.0
+        : (isLandscape ? 64.0 : size.width * 0.14);
+    // Use fixed heights to prevent collapse in landscape mode
+    final containerHeight = isTablet ? 100.0 : (isLandscape ? 72.0 : 88.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: SizedBox(
+        height: containerHeight,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.antiAlias, // Ensures items get clipped at the scroll container edge
+          itemCount: 7,
+          itemBuilder: (context, index) {
+            final date = startDate.add(Duration(days: index));
           final isSelected =
               date.year == selectedDate.year &&
               date.month == selectedDate.month &&
@@ -40,8 +46,8 @@ class HomeDateSelector extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 6),
               width: itemWidth,
               constraints: BoxConstraints(
-                minWidth: 60.0,
-                maxWidth: isTablet ? 100.0 : double.infinity,
+                minWidth: 50.0,
+                maxWidth: isTablet ? 100.0 : 90.0,
               ),
               decoration: BoxDecoration(
                 color: isSelected
@@ -90,6 +96,7 @@ class HomeDateSelector extends StatelessWidget {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 }

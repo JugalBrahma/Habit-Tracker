@@ -45,104 +45,113 @@ class _HomepageState extends State<Homepage> {
             final isTablet = constraints.maxWidth > 600;
             final horizontalPadding = isTablet ? 40.0 : 20.0;
             
-            return Column(
+            return ListView(
+              padding: EdgeInsets.zero,
               children: [
                 HomeHeader(scaffoldKey: _scaffoldKey),
-                SizedBox(height: isTablet ? 30.0 : 20.0),
-                HomeDateSelector(
-                  startDate: startDate,
-                  selectedDate: _selectedDate,
-                  onDateSelected: (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                  },
-                ),
-                SizedBox(height: isTablet ? 30.0 : 20.0),
-                Expanded(
-                  child: BlocBuilder<HabitService, HabitStates>(
-                    builder: (context, state) {
-                      if (state is HabitLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                SizedBox(height: isTablet ? 16.0 : 8.0),
+                BlocBuilder<HabitService, HabitStates>(
+                  builder: (context, state) {
+                    if (state is HabitLoading) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 60),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
 
-                      if (state is HabitLoaded) {
-                        final normalizedSelected = DateTime(
-                          _selectedDate.year,
-                          _selectedDate.month,
-                          _selectedDate.day,
-                        );
-                        final weekdayLabel = DateFormat.E().format(
-                          normalizedSelected,
-                        );
-                        final scheduledHabits = state.habits
-                            .where(
-                              (habit) => habit.repeatDays.contains(weekdayLabel),
-                            )
-                            .toList();
-                        final totalToday = scheduledHabits.length;
-                        final doneToday = scheduledHabits
-                            .where(
-                              (habit) =>
-                                  habit.completedDates.contains(normalizedSelected),
-                            )
-                            .length;
+                    if (state is HabitLoaded) {
+                      final normalizedSelected = DateTime(
+                        _selectedDate.year,
+                        _selectedDate.month,
+                        _selectedDate.day,
+                      );
+                      final weekdayLabel = DateFormat.E().format(
+                        normalizedSelected,
+                      );
+                      final scheduledHabits = state.habits
+                          .where(
+                            (habit) => habit.repeatDays.contains(weekdayLabel),
+                          )
+                          .toList();
+                      final totalToday = scheduledHabits.length;
+                      final doneToday = scheduledHabits
+                          .where(
+                            (habit) =>
+                                habit.completedDates.contains(normalizedSelected),
+                          )
+                          .length;
 
-                        if (totalToday == 0) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.event_busy,
-                                size: 64,
-                                color: Colors.grey[300],
+                      return Column(
+                        children: [
+                          HomeProgressCard(
+                            done: doneToday,
+                            total: totalToday,
+                            selectedDate: _selectedDate,
+                          ),
+                          SizedBox(height: isTablet ? 30.0 : 24.0),
+                          HomeDateSelector(
+                            startDate: startDate,
+                            selectedDate: _selectedDate,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _selectedDate = date;
+                              });
+                            },
+                          ),
+                          SizedBox(height: isTablet ? 30.0 : 20.0),
+                          if (totalToday == 0)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 40),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.event_busy,
+                                    size: 64,
+                                    color: Colors.grey[300],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    "No routines scheduled today",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                "No routines scheduled today",
-                                style: TextStyle(color: Colors.grey),
+                            )
+                          else
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.only(
+                                left: horizontalPadding,
+                                right: horizontalPadding,
+                                bottom: 100,
                               ),
-                            ],
-                          );
-                        }
-                        return Column(
-                          children: [
-                            HomeProgressCard(done: doneToday, total: totalToday),
-                            const SizedBox(height: 20),
-                            Expanded(
-                              child: ListView.separated(
-                                padding: EdgeInsets.only(
-                                  left: horizontalPadding,
-                                  right: horizontalPadding,
-                                  bottom: 100,
-                                ),
-                                itemCount: scheduledHabits.length,
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 12),
-                                itemBuilder: (context, index) {
-                                  final habit = scheduledHabits[index];
-                                  final isDone = habit.completedDates.contains(
-                                    normalizedSelected,
-                                  );
-                                  final streak = _currentStreak(
-                                    habit,
-                                    normalizedSelected,
-                                  );
-                                  return HomeHabitTile(
-                                    habit: habit,
-                                    isDone: isDone,
-                                    streak: streak,
-                                    date: normalizedSelected,
-                                  );
-                                },
-                              ),
+                              itemCount: scheduledHabits.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final habit = scheduledHabits[index];
+                                final isDone = habit.completedDates.contains(
+                                  normalizedSelected,
+                                );
+                                final streak = _currentStreak(
+                                  habit,
+                                  normalizedSelected,
+                                );
+                                return HomeHabitTile(
+                                  habit: habit,
+                                  isDone: isDone,
+                                  streak: streak,
+                                  date: normalizedSelected,
+                                );
+                              },
                             ),
-                          ],
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
               ],
             );

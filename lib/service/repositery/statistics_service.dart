@@ -56,6 +56,8 @@ class HabitStatisticsService {
       breakdown.add(
         HabitBreakdown(
           name: habit.name,
+          iconName: habit.iconName,
+          color: habit.color,
           percent: scheduledDays == 0
               ? 0
               : (completedDays / scheduledDays * 100).clamp(0, 100).toDouble(),
@@ -158,9 +160,16 @@ class StatisticsSnapshot {
 
 class HabitBreakdown {
   final String name;
+  final String iconName;
+  final int color;
   final double percent;
 
-  const HabitBreakdown({required this.name, required this.percent});
+  const HabitBreakdown({
+    required this.name,
+    required this.iconName,
+    required this.color,
+    required this.percent,
+  });
 }
 
 class HabitStreak {

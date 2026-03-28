@@ -15,8 +15,10 @@ class _NavigationpageState extends State<Navigationpage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
     final isTablet = size.width > 600;
-    final navBarHeight = isTablet ? 80.0 : size.height * 0.08;
+    // Fixed heights to avoid layout constraint violations in landscape mode
+    final navBarHeight = isTablet ? 80.0 : (isLandscape ? 60.0 : 68.0);
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

@@ -43,6 +43,10 @@ class HomeHabitTile extends StatelessWidget {
     final badgeColor = Color(habit.color);
     final theme = Theme.of(context);
 
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isFuture = date.isAfter(today);
+
     return Dismissible(
       key: Key(habit.id),
       direction: DismissDirection.endToStart,
@@ -190,6 +194,19 @@ class HomeHabitTile extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
+                  if (isFuture) {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Cannot complete habits in the future'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
                   context.read<HabitService>().add(ToggleHabit(habit.id, date));
                 },
                 child: AnimatedContainer(
@@ -197,15 +214,19 @@ class HomeHabitTile extends StatelessWidget {
                   height: 28,
                   width: 28,
                   decoration: BoxDecoration(
-                    color: isDone ? badgeColor : Colors.transparent,
+                    color: isFuture 
+                        ? Colors.grey.withOpacity(0.1) 
+                        : (isDone ? badgeColor : Colors.transparent),
                     borderRadius: BorderRadius.circular(8),
-                    border: isDone
+                    border: isDone || isFuture
                         ? null
                         : Border.all(color: Colors.grey[300]!, width: 2),
                   ),
-                  child: isDone
-                      ? const Icon(Icons.check, size: 18, color: Colors.white)
-                      : null,
+                  child: isFuture
+                      ? Icon(Icons.lock_outline_rounded, size: 16, color: Colors.grey[500])
+                      : isDone
+                          ? const Icon(Icons.check, size: 18, color: Colors.white)
+                          : null,
                 ),
               ),
             ],

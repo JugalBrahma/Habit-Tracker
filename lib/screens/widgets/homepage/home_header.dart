@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+
 import 'package:habit_tracker/theme/theme_cubit.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -15,27 +15,14 @@ class HomeHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  scaffoldKey.currentState?.openDrawer();
-                },
-                icon: Icon(
-                  Icons.menu,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                DateFormat.yMMMMEEEEd().format(DateTime.now()),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          IconButton(
+            onPressed: () {
+              scaffoldKey.currentState?.openDrawer();
+            },
+            icon: Icon(
+              Icons.menu,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           IconButton(
             onPressed: () {

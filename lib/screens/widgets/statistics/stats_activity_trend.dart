@@ -19,7 +19,7 @@ class StatsActivityTrend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -35,12 +35,12 @@ class StatsActivityTrend extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: const Color(0xFF00E676).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.show_chart_rounded,
-                  color: theme.colorScheme.primary,
+                child: const Icon(
+                  Icons.trending_up_rounded,
+                  color: Color(0xFF00E676),
                   size: 20,
                 ),
               ),
@@ -64,18 +64,27 @@ class StatsActivityTrend extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: spots.isEmpty ? [const FlSpot(0, 0)] : spots,
-                    isCurved: true,
-                    preventCurveOverShooting: true,
-                    color: theme.colorScheme.primary,
-                    barWidth: 4,
+                    isCurved: false,
+                    color: const Color(0xFF00E676),
+                    barWidth: 2.5,
                     isStrokeCapRound: true,
-                    dotData: const FlDotData(show: false),
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 3,
+                          color: const Color(0xFF00E676),
+                          strokeWidth: 1.5,
+                          strokeColor: const Color(0xFF00C853),
+                        );
+                      },
+                    ),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          theme.colorScheme.primary.withOpacity(0.2),
-                          theme.colorScheme.primary.withOpacity(0.0),
+                          const Color(0xFF00E676).withOpacity(0.25),
+                          const Color(0xFF00E676).withOpacity(0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

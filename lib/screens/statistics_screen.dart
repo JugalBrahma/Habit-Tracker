@@ -7,6 +7,7 @@ import 'package:habit_tracker/screens/widgets/statistics/stats_overall_card.dart
 import 'package:habit_tracker/screens/widgets/statistics/stats_activity_trend.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_habit_breakdown.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_streak_card.dart';
+import 'package:habit_tracker/screens/widgets/statistics/stats_momentum_card.dart';
 import 'package:habit_tracker/screens/widgets/statistics/stats_activity_map.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -133,6 +134,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
                   const SizedBox(height: 24),
                   StatsStreakCard(
+                    streak: stats.topStreak,
+                    cardBg: cardBg,
+                    borderColor: borderColor,
+                    textColor: textColor,
+                  ),
+                  const SizedBox(height: 24),
+                  StatsMomentumCard(
                     streak: stats.topStreak,
                     cardBg: cardBg,
                     borderColor: borderColor,

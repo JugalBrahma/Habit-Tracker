@@ -12,7 +12,6 @@ import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'package:habit_tracker/theme/theme_cubit.dart';
-import 'package:habit_tracker/screens/error_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,49 +24,39 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
 
-  // Smart error handler - shows user-friendly messages
+  // Smart error handler - logs errors without replacing the entire app
   FlutterError.onError = (FlutterErrorDetails details) {
     final errorString = details.exception.toString();
-    final stackTrace = details.stack.toString();
+    // Safely get stack trace (stack can be null)
+    final stackTrace = details.stack?.toString() ?? 'no stack trace';
 
-    // Ignore non-critical widget lifecycle errors
+    // Ignore non-critical widget lifecycle & layout errors
+    // (these happen naturally during rebuilds, rotation, navigation, etc.)
     if (errorString.contains('_dependents.isEmpty') ||
         errorString.contains('deactivated widget') ||
         errorString.contains('dirty widget') ||
         errorString.contains('was used after being disposed') ||
         errorString.contains('TextEditingController') ||
-        errorString.contains('Tried to build dirty widget')) {
-      debugPrint('Non-critical widget error (ignored): $errorString');
+        errorString.contains('Tried to build dirty widget') ||
+        errorString.contains('RenderBox was not laid out') ||
+        errorString.contains('setState() called after dispose') ||
+        errorString.contains('overflowed by') ||
+        errorString.contains('does not have a size yet') ||
+        errorString.contains('Null check operator') ||
+        (details.stack == null)) {
+      debugPrint('Non-critical error (ignored): $errorString');
       return;
     }
 
-    // Check if it's a network error
-    if (errorString.toLowerCase().contains('network') ||
-        errorString.toLowerCase().contains('socket') ||
-        errorString.toLowerCase().contains('connection') ||
-        errorString.toLowerCase().contains('timeout') ||
-        errorString.toLowerCase().contains('failed to connect')) {
-      runApp(
-        ErrorPage(
-          title: 'No Internet Connection',
-          message: 'Please check your internet connection and try again.',
-          error: errorString,
-        ),
-      );
-      return;
-    }
-
-    // Critical error - show error page
-    debugPrint('Critical Error: $errorString');
+    // Log the error for debugging — do NOT replace the app
+    debugPrint('Flutter Error: $errorString');
     debugPrint('Stack: $stackTrace');
-    runApp(
-      ErrorPage(
-        title: 'Something Went Wrong',
-        message: 'An unexpected error occurred. Please restart the app.',
-        error: errorString,
-      ),
-    );
+
+    // Let Flutter handle it with its default behavior (red screen in debug,
+    // grey screen in release) — keeps the app alive instead of crashing it
+    FlutterError.presentError(details);
   };
+
 
   try {
     await Firebase.initializeApp(
