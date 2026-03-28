@@ -118,185 +118,138 @@ class StatsStreakCard extends StatelessWidget {
               ),
             )
           else
-            Column(
-              children: [
-                // ─── MAIN STREAK DISPLAY ───
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        _fireOrange.withOpacity(isDark ? 0.12 : 0.06),
-                        _fireAmber.withOpacity(isDark ? 0.06 : 0.03),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _fireOrange.withOpacity(isDark ? 0.15 : 0.08),
+                    _fireRed.withOpacity(isDark ? 0.05 : 0.02),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: _fireOrange.withOpacity(isDark ? 0.2 : 0.1),
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Giant glowing flame
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [_fireAmber, _fireOrange, _fireRed],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _fireOrange.withOpacity(0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: _fireOrange.withOpacity(0.12)),
-                  ),
-                  child: Row(
-                    children: [
-                      // Fire streak number
-                      Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [_fireAmber, _fireOrange, _fireRed],
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _fireOrange.withOpacity(0.4),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${streak!.current}',
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.local_fire_department_rounded,
+                        color: Colors.white,
+                        size: 38,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              streak!.name,
-                              style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${streak!.current} day streak',
-                              style: TextStyle(
-                                color: textColor.withOpacity(0.5),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Flame indicator
-                      Column(
-                        children: List.generate(3, (i) {
-                          final isLit = streak!.current > i * 3;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
-                            child: Icon(
-                              Icons.local_fire_department_rounded,
-                              size: 20,
-                              color: isLit
-                                  ? [_fireAmber, _fireOrange, _fireRed][i]
-                                  : textColor.withOpacity(0.1),
-                            ),
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // ─── WEEKLY FIRE DOTS ───
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.03)
-                        : _fireOrange.withOpacity(0.03),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.05)
-                          : _fireOrange.withOpacity(0.08),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(7, (index) {
-                      final isActive = index < streak!.current.clamp(0, 7);
-                      final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                      return Column(
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: isActive
-                                  ? const LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [_fireAmber, _fireOrange],
-                                    )
-                                  : null,
-                              color: isActive
-                                  ? null
-                                  : (isDark
-                                      ? Colors.white.withOpacity(0.06)
-                                      : Colors.grey.withOpacity(0.1)),
-                              boxShadow: isActive
-                                  ? [
-                                      BoxShadow(
-                                        color: _fireOrange.withOpacity(0.35),
-                                        blurRadius: 6,
-                                      ),
-                                    ]
-                                  : [],
-                            ),
-                            child: Center(
-                              child: isActive
-                                  ? const Icon(
-                                      Icons.local_fire_department_rounded,
-                                      color: Colors.white,
-                                      size: 16,
-                                    )
-                                  : Container(
-                                      width: 6,
-                                      height: 6,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: textColor.withOpacity(0.15),
-                                      ),
-                                    ),
-                            ),
+                  const SizedBox(width: 20),
+                  // Text Content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ON FIRE',
+                          style: TextStyle(
+                            color: _fireOrange,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            fontSize: 10,
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            dayLabels[index],
-                            style: TextStyle(
-                              color: isActive
-                                  ? textColor.withOpacity(0.8)
-                                  : textColor.withOpacity(0.3),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${streak!.current} Days',
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                            fontSize: 28,
                           ),
-                        ],
-                      );
-                    }),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          streak!.name,
+                          style: TextStyle(
+                            color: textColor.withOpacity(0.6),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  // Best Streak Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                      ),
+                      boxShadow: isDark ? [] : [
+                        BoxShadow(
+                          color: _fireOrange.withOpacity(0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.workspace_premium_rounded,
+                          color: _fireAmber,
+                          size: 20,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'BEST',
+                          style: TextStyle(
+                            color: textColor.withOpacity(0.4),
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${streak!.best}',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
         ],
       ),

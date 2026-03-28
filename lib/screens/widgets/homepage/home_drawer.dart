@@ -9,105 +9,260 @@ class HomeDrawer extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     final avatarSize = isTablet ? 80.0 : size.width * 0.18;
-    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Drawer(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.tertiary,
+      backgroundColor: isDark ? const Color(0xFF0D131A) : Colors.grey[50],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(32)),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildPremiumHeader(context, avatarSize, isDark),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  _buildPremiumTile(
+                    context,
+                    icon: Icons.feedback_rounded,
+                    title: 'Send Feedback',
+                    gradient: const [Color(0xFF6C63FF), Color(0xFFB388FF)],
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showFeedbackDialog(context);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPremiumTile(
+                    context,
+                    icon: Icons.help_outline_rounded,
+                    title: 'App Guide',
+                    gradient: const [Color(0xFF00B0FF), Color(0xFF80D8FF)],
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showGuideDialog(context);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPremiumTile(
+                    context,
+                    icon: Icons.info_outline_rounded,
+                    title: 'About App',
+                    gradient: const [Color(0xFFFFAB40), Color(0xFFFFD180)],
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAboutDialog(context);
+                    },
+                  ),
                 ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    ClipOval(
-                      child: Container(
-                        width: avatarSize,
-                        height: avatarSize,
-                        color: Colors.white.withValues(alpha: 0.2),
-                        child: Transform.scale(
-                          scale: 1,
-                          child: Image.asset(
-                            'assets/app_logo/app_logo.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+            // Version Pill
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.source_rounded,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Version 1.0.2',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'BUILD 4',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
                       ),
                     ),
-                    Container(
-                      width: avatarSize,
-                      height: avatarSize,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumHeader(BuildContext context, double avatarSize, bool isDark) {
+    final primary = Theme.of(context).colorScheme.primary;
+    
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark 
+            ? [primary.withOpacity(0.3), primary.withOpacity(0.1)] 
+            : [primary, Theme.of(context).colorScheme.tertiary],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: isDark ? primary.withOpacity(0.2) : Colors.transparent,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: avatarSize,
+            height: avatarSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+              ],
+            ),
+            child: ClipOval(
+              child: Padding(
+                padding: const EdgeInsets.all(4.0), // Give logo breathing room
+                child: Image.asset(
+                  'assets/app_logo/app_logo.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   'Habit Tracker',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Build your best self',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(),
-          ListTile(
-            leading: Icon(
-              Icons.feedback_outlined,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            title: Text(
-              'Send Feedback',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showFeedbackDialog(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.help_outline_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            title: Text(
-              'App Guide',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showGuideDialog(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.info_outline,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            title: Text(
-              'About App',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showAboutDialog(context);
-            },
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required List<Color> gradient,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark 
+              ? Colors.white.withOpacity(0.02) 
+              : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark 
+                ? Colors.white.withOpacity(0.05) 
+                : Colors.black.withOpacity(0.04),
+          ),
+          boxShadow: isDark ? [] : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: gradient,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: gradient[0].withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }

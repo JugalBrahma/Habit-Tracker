@@ -322,21 +322,11 @@ class StatsMomentumCard extends StatelessWidget {
                       Text(
                         'BEST STREAK',
                         style: TextStyle(
-                          color: textColor.withOpacity(0.35),
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      Text(
-                        streak!.name,
-                        style: TextStyle(
                           color: textColor,
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
