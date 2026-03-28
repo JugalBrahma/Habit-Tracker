@@ -194,19 +194,7 @@ class HomeHabitTile extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  if (isFuture) {
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Cannot complete habits in the future'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                    return;
-                  }
+                  if (isFuture) return;
                   context.read<HabitService>().add(ToggleHabit(habit.id, date));
                 },
                 child: AnimatedContainer(
