@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class StatsActivityTrend extends StatelessWidget {
   final List<FlSpot> spots;
@@ -35,12 +36,12 @@ class StatsActivityTrend extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withOpacity(0.1),
+                  color: AppColors.trendPrimary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.trending_up_rounded,
-                  color: Color(0xFF00E676),
+                  color: AppColors.trendPrimary,
                   size: 20,
                 ),
               ),
@@ -65,7 +66,7 @@ class StatsActivityTrend extends StatelessWidget {
                   LineChartBarData(
                     spots: spots.isEmpty ? [const FlSpot(0, 0)] : spots,
                     isCurved: false,
-                    color: const Color(0xFF00E676),
+                    color: AppColors.trendPrimary,
                     barWidth: 2.5,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
@@ -73,9 +74,9 @@ class StatsActivityTrend extends StatelessWidget {
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 3,
-                          color: const Color(0xFF00E676),
+                          color: AppColors.trendPrimary,
                           strokeWidth: 1.5,
-                          strokeColor: const Color(0xFF00C853),
+                          strokeColor: AppColors.trendStroke,
                         );
                       },
                     ),
@@ -83,8 +84,8 @@ class StatsActivityTrend extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          const Color(0xFF00E676).withOpacity(0.25),
-                          const Color(0xFF00E676).withOpacity(0.0),
+                          AppColors.trendPrimary.withOpacity(0.25),
+                          AppColors.trendPrimary.withOpacity(0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

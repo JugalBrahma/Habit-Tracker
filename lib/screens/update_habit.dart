@@ -50,6 +50,11 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
     {'icon': Icons.eco, 'name': 'Nature'},
     {'icon': Icons.brush, 'name': 'Art'},
     {'icon': Icons.computer, 'name': 'Computer'},
+    {'icon': Icons.pool, 'name': 'Swim'},
+    {'icon': Icons.directions_car, 'name': 'Drive'},
+    {'icon': Icons.directions_bike, 'name': 'Bike'},
+    {'icon': Icons.blender, 'name': 'Protein'},
+    {'icon': Icons.airline_seat_individual_suite, 'name': 'Rest'},
   ];
 
   final List<String> _weekdays = [

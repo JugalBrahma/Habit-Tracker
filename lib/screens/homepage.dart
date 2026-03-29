@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/screens/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
-import 'package:habit_tracker/service/model/user_model.dart';
+
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_header.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_date_selector.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_progress_card.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_habit_tile.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_drawer.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -135,7 +136,7 @@ class _HomepageState extends State<Homepage> {
                                 final isDone = habit.completedDates.contains(
                                   normalizedSelected,
                                 );
-                                final streak = _currentStreak(
+                                final streak = HabitStatisticsService.currentStreak(
                                   habit,
                                   normalizedSelected,
                                 );
@@ -177,17 +178,5 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
     );
-  }
-
-  int _currentStreak(Habit habit, DateTime referenceDate) {
-    int streak = 0;
-    DateTime cursor = referenceDate;
-
-    while (habit.completedDates.contains(cursor)) {
-      streak += 1;
-      cursor = cursor.subtract(const Duration(days: 1));
-    }
-
-    return streak;
   }
 }

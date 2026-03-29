@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:habit_tracker/firebase_options.dart';
-import 'package:habit_tracker/theme/app_theme.dart';
+import 'package:habit_tracker/screens/config/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/navigationpage.dart';
@@ -11,11 +11,11 @@ import 'package:habit_tracker/service/repositery/habit_service.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:hive_flutter/adapters.dart';
 
-import 'package:habit_tracker/theme/theme_cubit.dart';
+import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Lock orientation to prevent crashes
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -57,7 +57,6 @@ void main() async {
     FlutterError.presentError(details);
   };
 
-
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -85,8 +84,6 @@ void main() async {
     ),
   );
 }
-
-
 
 class MyApp extends StatefulWidget {
   final HabitRepository repo;

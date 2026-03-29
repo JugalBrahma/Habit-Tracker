@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class StatsStreakCard extends StatelessWidget {
   final HabitStreak? streak;
@@ -15,10 +16,9 @@ class StatsStreakCard extends StatelessWidget {
     required this.textColor,
   });
 
-  // Fire palette
-  static const _fireOrange = Color(0xFFFF6D00);
-  static const _fireAmber = Color(0xFFFFAB00);
-  static const _fireRed = Color(0xFFFF3D00);
+  static const _fireOrange = AppColors.fireOrange;
+  static const _fireAmber = AppColors.fireAmber;
+  static const _fireRed = AppColors.fireRed;
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +170,7 @@ class StatsStreakCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ON FIRE',
+                          streak!.current > 0 ? 'ON FIRE' : 'BEST STREAK',
                           style: TextStyle(
                             color: _fireOrange,
                             fontWeight: FontWeight.w900,
@@ -180,7 +180,7 @@ class StatsStreakCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${streak!.current} Days',
+                          streak!.current > 0 ? '${streak!.current} Days' : '${streak!.best} Days',
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w900,

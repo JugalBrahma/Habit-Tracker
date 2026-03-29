@@ -27,6 +27,11 @@ class HomeHabitTile extends StatelessWidget {
     'Nature': Icons.eco,
     'Art': Icons.brush,
     'Computer': Icons.computer,
+    'Swim': Icons.pool,
+    'Drive': Icons.directions_car,
+    'Bike': Icons.directions_bike,
+    'Protein': Icons.blender,
+    'Rest': Icons.airline_seat_individual_suite,
   };
 
   const HomeHabitTile({
@@ -114,13 +119,10 @@ class HomeHabitTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.6),
+              width: 2.5,
+            ),
           ),
           child: Row(
             children: [
@@ -199,21 +201,21 @@ class HomeHabitTile extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  height: 28,
-                  width: 28,
+                  height: 36,
+                  width: 36,
                   decoration: BoxDecoration(
                     color: isFuture 
                         ? Colors.grey.withOpacity(0.1) 
-                        : (isDone ? badgeColor : Colors.transparent),
-                    borderRadius: BorderRadius.circular(8),
+                        : (isDone ? theme.colorScheme.primary : Colors.transparent),
+                    shape: BoxShape.circle,
                     border: isDone || isFuture
                         ? null
-                        : Border.all(color: Colors.grey[300]!, width: 2),
+                        : Border.all(color: Colors.grey[300]!, width: 2.5),
                   ),
                   child: isFuture
-                      ? Icon(Icons.lock_outline_rounded, size: 16, color: Colors.grey[500])
+                      ? Icon(Icons.lock_outline_rounded, size: 20, color: Colors.grey[500])
                       : isDone
-                          ? const Icon(Icons.check, size: 18, color: Colors.white)
+                          ? const Icon(Icons.check, size: 22, color: Colors.white)
                           : null,
                 ),
               ),

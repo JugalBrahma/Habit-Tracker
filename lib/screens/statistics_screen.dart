@@ -26,7 +26,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final scaffoldBg = isDark ? colorScheme.surface : Colors.grey[50];
+    final scaffoldBg = theme.scaffoldBackgroundColor;
     final cardBg =
         theme.cardTheme.color ??
         (isDark ? colorScheme.surfaceContainerHighest : Colors.white);

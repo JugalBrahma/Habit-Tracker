@@ -33,7 +33,7 @@ class StatsOverallCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withOpacity(isDark ? 0.08 : 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

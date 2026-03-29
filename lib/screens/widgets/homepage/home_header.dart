@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:habit_tracker/theme/theme_cubit.dart';
+import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
 
 class HomeHeader extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;

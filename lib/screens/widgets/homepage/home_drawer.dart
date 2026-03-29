@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({super.key});
@@ -12,7 +13,7 @@ class HomeDrawer extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Drawer(
-      backgroundColor: isDark ? const Color(0xFF0D131A) : Colors.grey[50],
+      backgroundColor: isDark ? AppColors.darkDrawer : Colors.grey[50],
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(right: Radius.circular(32)),
       ),
@@ -29,7 +30,7 @@ class HomeDrawer extends StatelessWidget {
                     context,
                     icon: Icons.feedback_rounded,
                     title: 'Send Feedback',
-                    gradient: const [Color(0xFF6C63FF), Color(0xFFB388FF)],
+                    gradient: const [AppColors.drawerGradient1Start, AppColors.drawerGradient1End],
                     onTap: () {
                       Navigator.pop(context);
                       _showFeedbackDialog(context);
@@ -40,7 +41,7 @@ class HomeDrawer extends StatelessWidget {
                     context,
                     icon: Icons.help_outline_rounded,
                     title: 'App Guide',
-                    gradient: const [Color(0xFF00B0FF), Color(0xFF80D8FF)],
+                    gradient: const [AppColors.drawerGradient2Start, AppColors.drawerGradient2End],
                     onTap: () {
                       Navigator.pop(context);
                       _showGuideDialog(context);
@@ -51,7 +52,7 @@ class HomeDrawer extends StatelessWidget {
                     context,
                     icon: Icons.info_outline_rounded,
                     title: 'About App',
-                    gradient: const [Color(0xFFFFAB40), Color(0xFFFFD180)],
+                    gradient: const [AppColors.drawerGradient3Start, AppColors.drawerGradient3End],
                     onTap: () {
                       Navigator.pop(context);
                       _showAboutDialog(context);

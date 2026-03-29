@@ -70,13 +70,16 @@ class HabitStatisticsService {
         heatmap[normalized] = (heatmap[normalized] ?? 0) + 1;
       }
 
-      final current = _currentStreak(habit, today);
+      final current = currentStreak(habit, today);
       final best = _bestStreak(habit);
       if (current == 0 && best == 0) {
         continue;
       }
       final existingCurrent = bestStreak?.current ?? -1;
+      final existingBest = bestStreak?.best ?? -1;
       if (current > existingCurrent) {
+        bestStreak = HabitStreak(habit.name, current, best);
+      } else if (current == existingCurrent && best > existingBest) {
         bestStreak = HabitStreak(habit.name, current, best);
       }
     }
@@ -100,38 +103,71 @@ class HabitStatisticsService {
       DateTime(dateTime.year, dateTime.month, dateTime.day);
 
   static int _bestStreak(Habit habit) {
-    final sorted = habit.completedDates.map(_normalize).toList()
+    if (habit.completedDates.isEmpty) return 0;
+    
+    final formatter = DateFormat.E();
+    final uniqueDates = habit.completedDates.map(_normalize).toSet().toList()
       ..sort((a, b) => a.compareTo(b));
+      
     int best = 0;
     int current = 0;
-    DateTime? previous;
-    for (final date in sorted) {
-      final prev = previous;
-      if (prev == null) {
+    DateTime? expectedNext;
+
+    for (final date in uniqueDates) {
+      if (expectedNext == null) {
         current = 1;
       } else {
-        final diff = date.difference(prev).inDays;
-        if (diff == 1) {
-          current += 1;
-        } else if (diff == 0) {
-          continue;
+        bool broken = false;
+        DateTime check = expectedNext;
+        while (check.isBefore(date)) {
+          if (habit.repeatDays.contains(formatter.format(check))) {
+            broken = true;
+            break;
+          }
+          check = check.add(const Duration(days: 1));
+        }
+        
+        if (broken) {
+          current = 1; 
         } else {
-          current = 1;
+          current += 1;
         }
       }
       if (current > best) best = current;
-      previous = date;
+      expectedNext = date.add(const Duration(days: 1));
     }
     return best;
   }
 
-  static int _currentStreak(Habit habit, DateTime referenceDate) {
+  static int currentStreak(Habit habit, DateTime referenceDate) {
+    if (habit.completedDates.isEmpty) return 0;
+    final formatter = DateFormat.E();
+    
     int streak = 0;
     DateTime cursor = referenceDate;
 
-    while (habit.completedDates.contains(cursor)) {
-      streak += 1;
+    if (!habit.completedDates.contains(cursor)) {
       cursor = cursor.subtract(const Duration(days: 1));
+      while (true) {
+        if (habit.completedDates.contains(cursor)) {
+          break;
+        }
+        if (habit.repeatDays.contains(formatter.format(cursor))) {
+          return 0; // Missed a scheduled day
+        }
+        cursor = cursor.subtract(const Duration(days: 1));
+        if (referenceDate.difference(cursor).inDays > 14) return 0;
+      }
+    }
+
+    while (true) {
+      if (habit.completedDates.contains(cursor)) {
+        streak += 1;
+      } else if (habit.repeatDays.contains(formatter.format(cursor))) {
+        break; 
+      }
+      cursor = cursor.subtract(const Duration(days: 1));
+      if (referenceDate.difference(cursor).inDays > 3650) break; 
     }
 
     return streak;

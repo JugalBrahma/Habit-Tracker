@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class AppTheme {
   // Indigo color scheme
   //theme.colorScheme.onSurface
-  static const Color primarySeed = Color(0xFF3F51B5); // Indigo for light theme
-  static const Color primarySeedDark = Color(
-    0xFF5C6BC0,
-  ); // Softer indigo for dark theme
+  static const Color primarySeed = AppColors.primarySeed; // Indigo for light theme
+  static const Color primarySeedDark = AppColors.primarySeedDark; // Softer indigo for dark theme
 
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -14,7 +13,7 @@ class AppTheme {
       seedColor: primarySeed,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: const Color(0xFFF5F7FA), // Light grey background
+    scaffoldBackgroundColor: AppColors.lightBackground, // Light grey background
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -46,7 +45,7 @@ class AppTheme {
       seedColor: primarySeedDark,
       brightness: Brightness.dark,
     ),
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    scaffoldBackgroundColor: AppColors.darkBackground,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -62,7 +61,7 @@ class AppTheme {
     cardTheme: CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: const Color(0xFF1E1E1E),
+      color: AppColors.darkCard,
       margin: const EdgeInsets.symmetric(vertical: 8),
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(

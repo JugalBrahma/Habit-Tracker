@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class StatsMomentumCard extends StatelessWidget {
   final HabitStreak? streak;
@@ -16,10 +17,10 @@ class StatsMomentumCard extends StatelessWidget {
   });
 
   // Water palette
-  static const _waterCyan = Color(0xFF00E5FF);
-  static const _waterBlue = Color(0xFF0077B6);
-  static const _waterLight = Color(0xFF48CAE4);
-  static const _waterDeep = Color(0xFF023E5A);
+  static const _waterCyan = AppColors.waterCyan;
+  static const _waterBlue = AppColors.waterBlue;
+  static const _waterLight = AppColors.waterLight;
+  static const _waterDeep = AppColors.waterDeep;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +32,10 @@ class StatsMomentumCard extends StatelessWidget {
 
     final currentStreak = streak!.current;
     final bestStreak = streak!.best;
-    final nextGoal = _calcNextGoal(currentStreak);
-    final progress = nextGoal > 0 ? (currentStreak / nextGoal).clamp(0.0, 1.0) : 0.0;
+    final displayStreak = currentStreak > 0 ? currentStreak : bestStreak;
+    final isDisplayingBest = currentStreak == 0 && bestStreak > 0;
+    final nextGoal = _calcNextGoal(displayStreak);
+    final progress = nextGoal > 0 ? (displayStreak / nextGoal).clamp(0.0, 1.0) : 0.0;
     final days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
     return Container(
@@ -120,8 +123,8 @@ class StatsMomentumCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [_waterDeep, const Color(0xFF012840)]
-                    : [const Color(0xFF0288D1), _waterBlue],
+                    ? [_waterDeep, AppColors.waterDark1]
+                    : [AppColors.waterDark2, _waterBlue],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
@@ -135,7 +138,7 @@ class StatsMomentumCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'YOUR CURRENT STREAK',
+                  isDisplayingBest ? 'YOUR BEST STREAK' : 'YOUR CURRENT STREAK',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.6),
                     fontSize: 10,
@@ -155,7 +158,7 @@ class StatsMomentumCard extends StatelessWidget {
                         colors: [Colors.white, _waterCyan],
                       ).createShader(bounds),
                       child: Text(
-                        '$currentStreak',
+                        '$displayStreak',
                         style: const TextStyle(
                           fontSize: 68,
                           fontWeight: FontWeight.w900,
@@ -182,7 +185,7 @@ class StatsMomentumCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '$currentStreak DAYS LOGGED',
+                      '$displayStreak DAYS LOGGED',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.85),
                         fontSize: 10,
@@ -258,7 +261,7 @@ class StatsMomentumCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(7, (index) {
-                    final isActive = index < currentStreak.clamp(0, 7);
+                    final isActive = index < displayStreak.clamp(0, 7);
                     return Column(
                       children: [
                         SizedBox(
@@ -430,7 +433,7 @@ class _WaterDropPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF00E5FF), Color(0xFF0091EA)],
+          colors: [AppColors.waterCyan, AppColors.waterGradientEnd],
           stops: [0.2, 1.0],
         ).createShader(Rect.fromLTWH(0, tipY, size.width, bottomY - tipY)));
 

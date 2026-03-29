@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 import 'dart:math' as math;
 
 class StatsHabitBreakdown extends StatelessWidget {
@@ -32,6 +33,11 @@ class StatsHabitBreakdown extends StatelessWidget {
     'Nature': Icons.eco,
     'Art': Icons.brush,
     'Computer': Icons.computer,
+    'Swim': Icons.pool,
+    'Drive': Icons.directions_car,
+    'Bike': Icons.directions_bike,
+    'Protein': Icons.blender,
+    'Rest': Icons.airline_seat_individual_suite,
   };
 
   @override
@@ -60,15 +66,15 @@ class StatsHabitBreakdown extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF6C63FF).withOpacity(0.15),
-                      const Color(0xFFB388FF).withOpacity(0.15),
+                      AppColors.habitBreakdownPrimary.withOpacity(0.15),
+                      AppColors.habitBreakdownSoft.withOpacity(0.15),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   Icons.donut_large_rounded,
-                  color: Color(0xFF6C63FF),
+                  color: AppColors.habitBreakdownPrimary,
                   size: 20,
                 ),
               ),
@@ -106,13 +112,13 @@ class StatsHabitBreakdown extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isDark
                         ? Colors.white.withOpacity(0.06)
-                        : const Color(0xFF6C63FF).withOpacity(0.08),
+                        : AppColors.habitBreakdownPrimary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     'AVG ${_average(sorted).toStringAsFixed(0)}%',
                     style: TextStyle(
-                      color: isDark ? Colors.white70 : const Color(0xFF6C63FF),
+                      color: isDark ? Colors.white70 : AppColors.habitBreakdownPrimary,
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
