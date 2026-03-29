@@ -17,6 +17,14 @@ class StatsActivityMap extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    // Transparent faint → bright vivid Nvidia green (more ticks = brighter)
+    final heatMapColors = [
+      const Color(0xFF76B900).withOpacity(0.12),
+      const Color(0xFF76B900).withOpacity(0.30),
+      const Color(0xFF76B900).withOpacity(0.55),
+      const Color(0xFF76B900).withOpacity(0.80),
+      const Color(0xFF76B900),                   // full bright Nvidia green
+    ];
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -66,11 +74,11 @@ class StatsActivityMap extends StatelessWidget {
             colorMode: ColorMode.color,
             datasets: data,
             colorsets: {
-              1: Colors.orange.withOpacity(0.2),
-              2: Colors.orange.withOpacity(0.4),
-              3: Colors.orange.withOpacity(0.6),
-              4: Colors.orange.withOpacity(0.8),
-              5: Colors.orange,
+              1: heatMapColors[0],
+              2: heatMapColors[1],
+              3: heatMapColors[2],
+              4: heatMapColors[3],
+              5: heatMapColors[4],
             },
             onClick: (_) {},
           ),
@@ -92,7 +100,7 @@ class StatsActivityMap extends StatelessWidget {
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2 * (index + 1)),
+                    color: heatMapColors[index],
                     borderRadius: BorderRadius.circular(2),
                   ),
                 );

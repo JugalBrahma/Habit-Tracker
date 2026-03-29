@@ -134,7 +134,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
                   const SizedBox(height: 24),
                   StatsStreakCard(
-                    streak: stats.topStreak,
+                    streaks: stats.topStreaks,
                     cardBg: cardBg,
                     borderColor: borderColor,
                     textColor: textColor,

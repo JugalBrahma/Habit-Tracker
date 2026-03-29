@@ -39,18 +39,16 @@ class StatsOverallCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Icon(
-              Icons.auto_graph_rounded,
-              size: 140,
-              color: Colors.white.withOpacity(0.1),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            Positioned(
+              right: 10,
+              bottom: -15,
+              child: AnimatedTreeBg(score: snapshot.completionRate.toDouble()),
             ),
-          ),
-          Padding(
+            Padding(
             padding: const EdgeInsets.all(24.0),
             child: Row(
               children: [
@@ -143,6 +141,65 @@ class StatsOverallCard extends StatelessWidget {
           ),
         ],
       ),
+      ),
+    );
+  }
+}
+
+class AnimatedTreeBg extends StatefulWidget {
+  final double score;
+
+  const AnimatedTreeBg({super.key, required this.score});
+
+  @override
+  State<AnimatedTreeBg> createState() => _AnimatedTreeBgState();
+}
+
+class _AnimatedTreeBgState extends State<AnimatedTreeBg> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Score determines base size (min 80, max 220)
+    final double targetSize = 80.0 + (widget.score.clamp(0.0, 100.0) * 1.4);
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // Gentle sway from -0.04 to 0.04 radians
+        final angle = (_controller.value - 0.5) * 0.08;
+        // Subtle breathing (1.0 to 1.05)
+        final scale = 1.0 + (_controller.value * 0.05);
+
+        return Transform.rotate(
+          angle: angle,
+          alignment: Alignment.bottomCenter,
+          child: Transform.scale(
+            scale: scale,
+            alignment: Alignment.bottomCenter,
+            child: Icon(
+              Icons.park_rounded,
+              size: targetSize,
+              color: Colors.white.withOpacity(0.25),
+            ),
+          ),
+        );
+      },
     );
   }
 }

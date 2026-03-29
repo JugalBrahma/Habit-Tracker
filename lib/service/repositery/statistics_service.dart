@@ -44,6 +44,8 @@ class HabitStatisticsService {
       spots.add(FlSpot(i.toDouble(), percent));
     }
 
+    final allStreaks = <HabitStreak>[];
+
     for (final habit in habits) {
       final scheduledDays = days
           .where((day) => habit.repeatDays.contains(formatter.format(day)))
@@ -82,7 +84,23 @@ class HabitStatisticsService {
       } else if (current == existingCurrent && best > existingBest) {
         bestStreak = HabitStreak(habit.name, current, best);
       }
+      
+      allStreaks.add(HabitStreak(habit.name, current, best));
     }
+
+    allStreaks.sort((a, b) {
+      if (b.current != a.current) return b.current.compareTo(a.current);
+      return b.best.compareTo(a.best);
+    });
+
+    int streaksToShow = 1;
+    if (habits.length > 5) {
+      streaksToShow = 3;
+    } else if (habits.length > 3) {
+      streaksToShow = 2;
+    }
+
+    final topStreaks = allStreaks.take(streaksToShow).toList();
 
     final completionRate = scheduled == 0
         ? 0
@@ -95,6 +113,7 @@ class HabitStatisticsService {
       trendSpots: spots,
       breakdown: breakdown,
       topStreak: bestStreak,
+      topStreaks: topStreaks,
       heatmapData: heatmap,
     );
   }
@@ -181,6 +200,7 @@ class StatisticsSnapshot {
   final List<FlSpot> trendSpots;
   final List<HabitBreakdown> breakdown;
   final HabitStreak? topStreak;
+  final List<HabitStreak> topStreaks;
   final Map<DateTime, int> heatmapData;
 
   const StatisticsSnapshot({
@@ -190,6 +210,7 @@ class StatisticsSnapshot {
     required this.trendSpots,
     required this.breakdown,
     required this.topStreak,
+    required this.topStreaks,
     required this.heatmapData,
   });
 }
