@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/homepage.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:habit_tracker/screens/statistics_screen.dart';
 
 class Navigationpage extends StatefulWidget {
@@ -68,6 +69,9 @@ class _NavigationpageState extends State<Navigationpage> {
                           NavigationDestinationLabelBehavior.alwaysHide,
                       height: navBarHeight,
                       onDestinationSelected: (value) {
+                        if (value == 1) {
+                          FirebaseAnalytics.instance.logEvent(name: 'stats_tab_click');
+                        }
                         setState(() {
                           _selectedindex = value;
                         });

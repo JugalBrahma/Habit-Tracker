@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/screens/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:intl/intl.dart';
 import 'package:habit_tracker/screens/widgets/homepage/home_header.dart';
@@ -164,6 +165,7 @@ class _HomepageState extends State<Homepage> {
         padding: const EdgeInsets.only(bottom: 90),
         child: FloatingActionButton(
           onPressed: () {
+            FirebaseAnalytics.instance.logEvent(name: 'create_habit_click');
             controller.clear();
             Navigator.push(
               context,

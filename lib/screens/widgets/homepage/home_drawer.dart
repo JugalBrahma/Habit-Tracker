@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -32,6 +33,7 @@ class HomeDrawer extends StatelessWidget {
                     title: 'Send Feedback',
                     gradient: const [AppColors.drawerGradient1Start, AppColors.drawerGradient1End],
                     onTap: () {
+                      FirebaseAnalytics.instance.logEvent(name: 'drawer_feedback_click');
                       Navigator.pop(context);
                       _showFeedbackDialog(context);
                     },
@@ -43,6 +45,7 @@ class HomeDrawer extends StatelessWidget {
                     title: 'App Guide',
                     gradient: const [AppColors.drawerGradient2Start, AppColors.drawerGradient2End],
                     onTap: () {
+                      FirebaseAnalytics.instance.logEvent(name: 'drawer_guide_click');
                       Navigator.pop(context);
                       _showGuideDialog(context);
                     },
@@ -54,6 +57,7 @@ class HomeDrawer extends StatelessWidget {
                     title: 'About App',
                     gradient: const [AppColors.drawerGradient3Start, AppColors.drawerGradient3End],
                     onTap: () {
+                      FirebaseAnalytics.instance.logEvent(name: 'drawer_about_click');
                       Navigator.pop(context);
                       _showAboutDialog(context);
                     },
