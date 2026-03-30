@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class HomeHeader extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -26,6 +27,14 @@ class HomeHeader extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              FirebaseAnalytics.instance.logEvent(
+                name: 'theme_toggle',
+                parameters: {
+                  'from_theme': isDark ? 'dark' : 'light',
+                  'to_theme': isDark ? 'light' : 'dark',
+                },
+              );
               context.read<ThemeCubit>().toggleTheme();
             },
             icon: Icon(
