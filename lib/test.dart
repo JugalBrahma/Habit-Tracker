@@ -1,0 +1,7 @@
+//banner ad
+//App id: ca-app-pub-5818311240277823~4741484571
+//Unit id: ca-app-pub-5818311240277823/4478160071
+
+//Rewarded ad
+//App id: ca-app-pub-5818311240277823~4741484571
+//Unit id: ca-app-pub-5818311240277823/4879030033

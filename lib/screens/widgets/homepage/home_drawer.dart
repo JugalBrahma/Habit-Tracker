@@ -1,10 +1,87 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:habit_tracker/adhelper.dart';
 import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 
-class HomeDrawer extends StatelessWidget {
+class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
+
+  @override
+  State<HomeDrawer> createState() => _HomeDrawerState();
+}
+
+class _HomeDrawerState extends State<HomeDrawer> {
+  RewardedAd? _rewardedAd;
+  bool _isAdLoading = false;
+
+  void _loadRewardedAd() {
+    setState(() {
+      _isAdLoading = true;
+    });
+    RewardedAd.load(
+      adUnitId: Adhelper.rewardedAdUnitId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          setState(() {
+            _rewardedAd = ad;
+            _isAdLoading = false;
+          });
+          _showRewardedAd();
+        },
+        onAdFailedToLoad: (error) {
+          setState(() {
+            _isAdLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to load ad. Please try again later.')),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showRewardedAd() {
+    if (_rewardedAd == null) return;
+
+    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        setState(() {
+          _rewardedAd = null;
+        });
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        setState(() {
+          _rewardedAd = null;
+        });
+      },
+    );
+
+    _rewardedAd!.show(
+      onUserEarnedReward: (AdWithoutView ad, RewardItem reward) async {
+        await Adhelper.disableAdsFor24Hours();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ads removed for the next 24 hours!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context); // Close drawer
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _rewardedAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +138,15 @@ class HomeDrawer extends StatelessWidget {
                       Navigator.pop(context);
                       _showAboutDialog(context);
                     },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPremiumTile(
+                    context,
+                    icon: Icons.ad_units_rounded,
+                    title: _isAdLoading ? 'Loading Ad...' : 'Remove Ads (24h)',
+                    subtitle: 'Watch a short ad to disable banners',
+                    gradient: const [Color(0xFFFF9800), Color(0xFFFF5722)],
+                    onTap: _isAdLoading ? () {} : _loadRewardedAd,
                   ),
                 ],
               ),
@@ -200,6 +286,7 @@ class HomeDrawer extends StatelessWidget {
     BuildContext context, {
     required IconData icon,
     required String title,
+    String? subtitle,
     required List<Color> gradient,
     required VoidCallback onTap,
   }) {
@@ -251,14 +338,28 @@ class HomeDrawer extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                ],
               ),
             ),
             Icon(

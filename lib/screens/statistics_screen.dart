@@ -113,52 +113,54 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     horizontal: horizontalPadding,
                     vertical: 16,
                   ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatsOverallCard(snapshot: stats, dateRange: date),
-                  const SizedBox(height: 24),
-                  StatsActivityTrend(
-                    spots: stats.trendSpots,
-                    range: date,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      StatsOverallCard(snapshot: stats, dateRange: date),
+                      const SizedBox(height: 24),
+                      StatsActivityTrend(
+                        spots: stats.trendSpots,
+                        range: date,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        textColor: textColor,
+                      ),
+                      const SizedBox(height: 24),
+                      StatsHabitBreakdown(
+                        breakdowns: stats.breakdown,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        textColor: textColor,
+                      ),
+                      const SizedBox(height: 24),
+                      StatsStreakCard(
+                        streaks: stats.topStreaks,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        textColor: textColor,
+                      ),
+                      const SizedBox(height: 24),
+                      StatsMomentumCard(
+                        streak: stats.topStreak,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        textColor: textColor,
+                      ),
+                      const SizedBox(height: 24),
+                      StatsActivityMap(
+                        data: stats.heatmapData,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                      ),
+                      const SizedBox(height: 120),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  StatsHabitBreakdown(
-                    breakdowns: stats.breakdown,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                  ),
-                  const SizedBox(height: 24),
-                  StatsStreakCard(
-                    streaks: stats.topStreaks,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                  ),
-                  const SizedBox(height: 24),
-                  StatsMomentumCard(
-                    streak: stats.topStreak,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                  ),
-                  const SizedBox(height: 24),
-                  StatsActivityMap(
-                    data: stats.heatmapData,
-                    cardBg: cardBg,
-                    borderColor: borderColor,
-                  ),
-                  const SizedBox(height: 120),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
-      );
-   } )
-  );}
+      ),
+    );
+  }
 }

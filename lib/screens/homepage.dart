@@ -46,7 +46,7 @@ class _HomepageState extends State<Homepage> {
           builder: (context, constraints) {
             final isTablet = constraints.maxWidth > 600;
             final horizontalPadding = isTablet ? 40.0 : 20.0;
-            
+
             return ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -78,8 +78,9 @@ class _HomepageState extends State<Homepage> {
                       final totalToday = scheduledHabits.length;
                       final doneToday = scheduledHabits
                           .where(
-                            (habit) =>
-                                habit.completedDates.contains(normalizedSelected),
+                            (habit) => habit.completedDates.contains(
+                              normalizedSelected,
+                            ),
                           )
                           .length;
 
@@ -137,10 +138,11 @@ class _HomepageState extends State<Homepage> {
                                 final isDone = habit.completedDates.contains(
                                   normalizedSelected,
                                 );
-                                final streak = HabitStatisticsService.currentStreak(
-                                  habit,
-                                  normalizedSelected,
-                                );
+                                final streak =
+                                    HabitStatisticsService.currentStreak(
+                                      habit,
+                                      normalizedSelected,
+                                    );
                                 return HomeHabitTile(
                                   habit: habit,
                                   isDone: isDone,
@@ -149,7 +151,7 @@ class _HomepageState extends State<Homepage> {
                                 );
                               },
                             ),
-                            const SizedBox(height: 180),
+                          const SizedBox(height: 180),
                         ],
                       );
                     }

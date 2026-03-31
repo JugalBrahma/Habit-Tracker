@@ -4,17 +4,21 @@ import 'package:habit_tracker/firebase_options.dart';
 import 'package:habit_tracker/screens/config/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:habit_tracker/navigationpage.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/repositery/habit_repositery.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
+import 'package:habit_tracker/service/notification_service.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
+  await MobileAds.instance.initialize();
 
   // Lock orientation to prevent crashes
   await SystemChrome.setPreferredOrientations([
@@ -70,6 +74,7 @@ void main() async {
     Hive.registerAdapter(HabitAdapter());
     await Hive.openBox('Habits');
     await Hive.openBox('themePreferences');
+    await Adhelper.initPreferences(); // Initialize ad preferences
   } catch (e) {
     debugPrint('Hive initialization error: $e');
     return;

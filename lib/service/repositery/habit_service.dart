@@ -3,13 +3,15 @@ import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:habit_tracker/service/repositery/habit_repositery.dart';
+import 'package:habit_tracker/service/notification_service.dart';
 
 class HabitService extends Bloc<HabitEvents, HabitStates> {
   final HabitRepository _repository;
   HabitService(this._repository) : super(HabitLoading()) {
     on<LoadHabit>((event, emit) {
-      // after loading, set initial list
-      emit(HabitLoaded(habits: _repository.loadHabits()));
+      final habits = _repository.loadHabits();
+      NotificationService.updateHabitNotification(habits);
+      emit(HabitLoaded(habits: habits));
     });
 
     on<AddHabit>((event, emit) async {
@@ -30,10 +32,11 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
         );
 
         await _repository.saveHabit(newHabit);
-        emit(HabitLoaded(habits: [...current.habits, newHabit]));
+        final updatedHabits = [...current.habits, newHabit];
+        NotificationService.updateHabitNotification(updatedHabits);
+        emit(HabitLoaded(habits: updatedHabits));
       } catch (e) {
         print('Error adding habit: $e');
-        // Continue with current state if save fails
       }
     });
 
@@ -51,6 +54,7 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
         return updatedHabit;
       }).toList();
 
+      NotificationService.updateHabitNotification(updatedHabits);
       emit(HabitLoaded(habits: updatedHabits));
     });
 
@@ -60,10 +64,10 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
 
       await _repository.deleteHabit(event.habitId);
 
-      final updatedHabits = current.habits
-          .where((habit) => habit.id != event.habitId)
-          .toList();
+      final updatedHabits =
+          current.habits.where((habit) => habit.id != event.habitId).toList();
 
+      NotificationService.updateHabitNotification(updatedHabits);
       emit(HabitLoaded(habits: updatedHabits));
     });
 
@@ -88,6 +92,7 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
         return updatedHabit;
       }).toList();
 
+      NotificationService.updateHabitNotification(updatedHabits);
       emit(HabitLoaded(habits: updatedHabits));
     });
   }
