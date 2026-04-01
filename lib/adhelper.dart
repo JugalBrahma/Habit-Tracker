@@ -20,6 +20,10 @@ class Adhelper {
     }
   }
 
+  static String get rewardedAdUnitId {
+    if (isTestMode) {
+      return 'ca-app-pub-3940256099942544/5224354917'; // Google Test Rewarded ID
+    }
 
     if (Platform.isAndroid) {
       return 'ca-app-pub-5818311240277823/4879030033';

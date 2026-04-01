@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
+import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/color_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/repeat_days_selector.dart';
@@ -210,15 +211,19 @@ class _CreateRoutineState extends State<CreateRoutine> {
   void _submitHabit() {
     final title = habitname.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a habit name before saving')),
+      PremiumSnackBar.show(
+        context,
+        message: 'Enter a habit name before saving',
+        isError: true,
       );
       return;
     }
 
     if (_selectedIconName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pick an icon for this habit')),
+      PremiumSnackBar.show(
+        context,
+        message: 'Pick an icon for this habit',
+        isError: true,
       );
       return;
     }

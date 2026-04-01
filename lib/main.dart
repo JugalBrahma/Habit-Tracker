@@ -14,6 +14,7 @@ import 'package:habit_tracker/service/notification_service.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
+import 'package:habit_tracker/adhelper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

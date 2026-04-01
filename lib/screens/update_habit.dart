@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
+import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/color_picker.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/icon_picker.dart';
@@ -217,8 +218,10 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
   void _updateHabit() {
     final title = habitname.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Habit name cannot be empty')),
+      PremiumSnackBar.show(
+        context,
+        message: 'Habit name cannot be empty',
+        isError: true,
       );
       return;
     }

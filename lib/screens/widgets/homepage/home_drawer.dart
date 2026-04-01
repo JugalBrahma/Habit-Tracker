@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:habit_tracker/adhelper.dart';
 import 'package:habit_tracker/screens/config/colors/app_colors.dart';
+import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
@@ -35,8 +36,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
           setState(() {
             _isAdLoading = false;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to load ad. Please try again later.')),
+          PremiumSnackBar.show(
+            context,
+            message: 'Failed to load ad. Please try again later.',
+            isError: true,
           );
         },
       ),
@@ -65,11 +68,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
       onUserEarnedReward: (AdWithoutView ad, RewardItem reward) async {
         await Adhelper.disableAdsFor24Hours();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Ads removed for the next 24 hours!'),
-              backgroundColor: Colors.green,
-            ),
+          PremiumSnackBar.show(
+            context,
+            title: 'Ads Removed!',
+            message: 'Enjoy an ad-free experience for the next 24 hours.',
+            icon: Icons.stars_rounded,
+            backgroundColor: Colors.green.shade600,
           );
           Navigator.pop(context); // Close drawer
         }
@@ -142,7 +146,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   const SizedBox(height: 12),
                   _buildPremiumTile(
                     context,
-                    icon: Icons.ad_units_rounded,
+                    icon: Icons.workspace_premium_rounded,
                     title: _isAdLoading ? 'Loading Ad...' : 'Remove Ads (24h)',
                     subtitle: 'Watch a short ad to disable banners',
                     gradient: const [Color(0xFFFF9800), Color(0xFFFF5722)],
@@ -531,11 +535,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
             if (!context.mounted) return;
 
             // Show success snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Feedback sent! Thank you for your support.'),
-                behavior: SnackBarBehavior.floating,
-              ),
+            PremiumSnackBar.show(
+              context,
+              title: 'Success!',
+              message: 'Feedback sent! Thank you for your support.',
+              icon: Icons.auto_awesome,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             );
 
             // Close dialog immediately
@@ -551,11 +556,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
               if (!context.mounted) return;
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Feedback sent! Thank you for your support.'),
-                  behavior: SnackBarBehavior.floating,
-                ),
+              PremiumSnackBar.show(
+                context,
+                title: 'Success!',
+                message: 'Feedback sent! Thank you for your support.',
+                icon: Icons.auto_awesome,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               );
 
               if (!context.mounted) return;

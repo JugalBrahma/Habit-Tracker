@@ -4,6 +4,7 @@ import 'package:habit_tracker/screens/update_habit.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
+import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 
 class HomeHabitTile extends StatelessWidget {
   final Habit habit;
@@ -93,14 +94,12 @@ class HomeHabitTile extends StatelessWidget {
       },
       onDismissed: (direction) {
         context.read<HabitService>().add(DeleteHabit(habit.id));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('"${habit.name}" deleted'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+        PremiumSnackBar.show(
+          context,
+          title: 'Habit Deleted',
+          message: '"${habit.name}" has been removed.',
+          icon: Icons.delete_sweep_rounded,
+          backgroundColor: theme.colorScheme.error,
         );
       },
       background: Container(
