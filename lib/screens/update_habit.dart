@@ -11,6 +11,8 @@ import 'package:habit_tracker/screens/widgets/update_habit/reminder_tile.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/goal_duration_selector.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/update_form_fields.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/update_habit_button.dart';
+import 'package:habit_tracker/screens/widgets/update_habit/activity_map.dart';
+import 'package:habit_tracker/service/bloc/habit_state.dart';
 
 class UpdateHabitPage extends StatefulWidget {
   final Habit habit;
@@ -103,96 +105,116 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
     final secondaryTextColor = colorScheme.onSurface.withOpacity(0.6);
     final scaffoldBg = isDark ? colorScheme.surface : Colors.grey[50];
 
-    return Scaffold(
-      backgroundColor: scaffoldBg,
-      appBar: AppBar(
-        title: const Text(
-          "Update Habit",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: textColor,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _sectionHeader("General Info", primaryColor),
-              const SizedBox(height: 12),
-              UpdateFormFields(
-                habitname: habitname,
-                description: description,
-                selectedColor: _selectedColor,
-              ),
-              const SizedBox(height: 32),
-              _sectionHeader("Appearance", primaryColor),
-              const SizedBox(height: 16),
-              _subHeader('Color Theme', secondaryTextColor),
-              const SizedBox(height: 12),
-              ColorPicker(
-                colors: _colors,
-                selectedColor: _selectedColor,
-                onColorSelected: (color) =>
-                    setState(() => _selectedColor = color),
-              ),
-              const SizedBox(height: 24),
-              _subHeader("Icon", secondaryTextColor),
-              const SizedBox(height: 12),
-              IconPicker(
-                icons: _icons,
-                selectedIconName: _selectedIconName,
-                selectedColor: _selectedColor,
-                onIconSelected: (name) =>
-                    setState(() => _selectedIconName = name),
-              ),
-              const SizedBox(height: 32),
-              _sectionHeader("Schedule", primaryColor),
-              const SizedBox(height: 16),
-              _subHeader('Repeat Days', secondaryTextColor),
-              const SizedBox(height: 12),
-              RepeatDaysSelector(
-                weekdays: _weekdays,
-                selectedRepeatDays: _selectedRepeatDays,
-                selectedColor: _selectedColor,
-                onDayToggled: (day) {
-                  setState(() {
-                    if (_selectedRepeatDays.contains(day)) {
-                      _selectedRepeatDays.remove(day);
-                    } else {
-                      _selectedRepeatDays.add(day);
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              ReminderTile(
-                reminderTime: _reminderTime,
-                selectedColor: _selectedColor,
-                onReminderChanged: (time) =>
-                    setState(() => _reminderTime = time),
-              ),
-              const SizedBox(height: 24),
-              _subHeader('Goal Duration', secondaryTextColor),
-              const SizedBox(height: 12),
-              GoalDurationSelector(
-                targetDays: _targetDays,
-                selectedColor: _selectedColor,
-                onGoalChanged: (val) => setState(() => _targetDays = val),
-              ),
-              const SizedBox(height: 48),
-              UpdateHabitButton(
-                selectedColor: _selectedColor,
-                onTap: _updateHabit,
-              ),
-              const SizedBox(height: 32),
-            ],
+    return BlocBuilder<HabitService, HabitStates>(
+      builder: (context, state) {
+        // Find the most recent version of this habit from the state
+        Habit currentHabit = widget.habit;
+        if (state is HabitLoaded) {
+          currentHabit = state.habits.firstWhere(
+            (h) => h.id == widget.habit.id,
+            orElse: () => widget.habit,
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: scaffoldBg,
+          appBar: AppBar(
+            title: const Text(
+              "Update Habit",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            foregroundColor: textColor,
           ),
-        ),
-      ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionHeader("General Info", primaryColor),
+                  const SizedBox(height: 12),
+                  UpdateFormFields(
+                    habitname: habitname,
+                    description: description,
+                    selectedColor: _selectedColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _sectionHeader("Appearance", primaryColor),
+                  const SizedBox(height: 16),
+                  _subHeader('Color Theme', secondaryTextColor),
+                  const SizedBox(height: 12),
+                  ColorPicker(
+                    colors: _colors,
+                    selectedColor: _selectedColor,
+                    onColorSelected: (color) =>
+                        setState(() => _selectedColor = color),
+                  ),
+                  const SizedBox(height: 24),
+                  _subHeader("Icon", secondaryTextColor),
+                  const SizedBox(height: 12),
+                  IconPicker(
+                    icons: _icons,
+                    selectedIconName: _selectedIconName,
+                    selectedColor: _selectedColor,
+                    onIconSelected: (name) =>
+                        setState(() => _selectedIconName = name),
+                  ),
+                  const SizedBox(height: 32),
+                  _sectionHeader("Activity History", primaryColor),
+                  const SizedBox(height: 16),
+                  ActivityMap(
+                    habit: currentHabit,
+                    selectedColor: primaryColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _sectionHeader("Schedule", primaryColor),
+                  const SizedBox(height: 16),
+                  _subHeader('Repeat Days', secondaryTextColor),
+                  const SizedBox(height: 12),
+                  RepeatDaysSelector(
+                    weekdays: _weekdays,
+                    selectedRepeatDays: _selectedRepeatDays,
+                    selectedColor: _selectedColor,
+                    onDayToggled: (day) {
+                      setState(() {
+                        if (_selectedRepeatDays.contains(day)) {
+                          _selectedRepeatDays.remove(day);
+                        } else {
+                          _selectedRepeatDays.add(day);
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  ReminderTile(
+                    reminderTime: _reminderTime,
+                    selectedColor: _selectedColor,
+                    onReminderChanged: (time) =>
+                        setState(() => _reminderTime = time),
+                  ),
+                  const SizedBox(height: 24),
+                  _subHeader('Goal Duration', secondaryTextColor),
+                  const SizedBox(height: 12),
+                  GoalDurationSelector(
+                    targetDays: _targetDays,
+                    selectedColor: _selectedColor,
+                    onGoalChanged: (val) => setState(() => _targetDays = val),
+                  ),
+                  const SizedBox(height: 48),
+                  UpdateHabitButton(
+                    selectedColor: _selectedColor,
+                    onTap: _updateHabit,
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
