@@ -68,7 +68,7 @@ class HabitStatisticsService {
 
       for (final date in habit.completedDates) {
         final normalized = _normalize(date);
-        if (normalized.isAfter(today)) continue;
+        if (normalized.isAfter(today) || normalized.isBefore(start)) continue;
         heatmap[normalized] = (heatmap[normalized] ?? 0) + 1;
       }
 

@@ -57,7 +57,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            if (keystoreProperties["keyAlias"] != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }
