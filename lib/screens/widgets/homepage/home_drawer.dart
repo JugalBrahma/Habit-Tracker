@@ -33,12 +33,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
           _showRewardedAd();
         },
         onAdFailedToLoad: (error) {
+          debugPrint('RewardedAd failed to load: $error');
           setState(() {
             _isAdLoading = false;
           });
           PremiumSnackBar.show(
             context,
-            message: 'Failed to load ad. Please try again later.',
+            message: 'Ad Load Error: ${error.message}',
             isError: true,
           );
         },
