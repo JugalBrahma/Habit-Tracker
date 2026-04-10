@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class Adhelper {
-  // Use true for development to confirm implementation works. 
+  // Use true for development to confirm implementation works.
   // Use false for production once your AdMob account is ready and app is approved.
-  static bool get isTestMode => true; 
+  static bool get isTestMode => true;
 
   static String get bannerAdUnitId {
     if (isTestMode) {
@@ -45,9 +45,10 @@ class Adhelper {
 
   static bool areAdsDisabled() {
     final box = Hive.box(_adPreferencesBox);
-    final disabledUntilMs = box.get(_adsDisabledUntilKey, defaultValue: 0) as int;
+    final disabledUntilMs =
+        box.get(_adsDisabledUntilKey, defaultValue: 0) as int;
     if (disabledUntilMs == 0) return false;
-    
+
     final disabledUntil = DateTime.fromMillisecondsSinceEpoch(disabledUntilMs);
     return DateTime.now().isBefore(disabledUntil);
   }
