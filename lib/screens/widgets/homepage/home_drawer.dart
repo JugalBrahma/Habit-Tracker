@@ -39,7 +39,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
           });
           PremiumSnackBar.show(
             context,
-            message: 'Ad Load Error: ${error.message}',
+            message: 'Unable to load ad. Please try again later.',
             isError: true,
           );
         },
