@@ -177,7 +177,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Version 1.0.2',
+                    'Version 1.0.5',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -193,7 +193,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      'BUILD 4',
+                      'BUILD 6',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 9,
