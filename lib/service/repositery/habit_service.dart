@@ -44,12 +44,21 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
       if (state is! HabitLoaded) return;
       final current = state as HabitLoaded;
       final day = DateTime(event.date.year, event.date.month, event.date.day);
+      final dateKey = '${day.year}-${day.month}-${day.day}';
 
       final updatedHabits = current.habits.map((habit) {
         if (habit.id != event.habitId) return habit;
         final dates = habit.completedDateSet;
+        final isComplete = dates.contains(day);
         dates.contains(day) ? dates.remove(day) : dates.add(day);
-        final updatedHabit = habit.copyWith(completedDates: dates);
+        
+        final updatedPercentages = Map<String, int>.from(habit.completionPercentage);
+        updatedPercentages[dateKey] = isComplete ? 0 : 100;
+        
+        final updatedHabit = habit.copyWith(
+          completedDates: dates,
+          completionPercentage: updatedPercentages,
+        );
         _repository.saveHabit(updatedHabit);
         return updatedHabit;
       }).toList();
@@ -93,6 +102,36 @@ class HabitService extends Bloc<HabitEvents, HabitStates> {
       }).toList();
 
       NotificationService.updateHabitNotification(updatedHabits);
+      emit(HabitLoaded(habits: updatedHabits));
+    });
+
+    on<UpdateHabitPercentage>((event, emit) async {
+      if (state is! HabitLoaded) return;
+      final current = state as HabitLoaded;
+
+      final updatedHabits = current.habits.map((habit) {
+        if (habit.id != event.habitId) return habit;
+
+        final dates = habit.completedDateSet;
+        for (final entry in event.completionPercentage.entries) {
+          final parts = entry.key.split('-');
+          final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+          if (entry.value == 100) {
+            dates.add(date);
+          } else {
+            dates.remove(date);
+          }
+        }
+
+        final updatedHabit = habit.copyWith(
+          completionPercentage: event.completionPercentage,
+          completedDates: dates,
+        );
+
+        _repository.saveHabit(updatedHabit);
+        return updatedHabit;
+      }).toList();
+
       emit(HabitLoaded(habits: updatedHabits));
     });
   }

@@ -33,7 +33,7 @@ class HabitStatisticsService {
       scheduled += todaysHabits.length;
       var doneToday = 0;
       for (final habit in todaysHabits) {
-        if (habit.completedDates.contains(day)) {
+        if (habit.getCompletionPercentage(day) == 100) {
           doneToday += 1;
         }
       }
@@ -50,9 +50,8 @@ class HabitStatisticsService {
       final scheduledDays = days
           .where((day) => habit.repeatDays.contains(formatter.format(day)))
           .length;
-      final completedDays = habit.completedDates.where((dateTime) {
-        final normalized = _normalize(dateTime);
-        return !normalized.isBefore(start) && !normalized.isAfter(today);
+      final completedDays = days.where((day) {
+        return habit.getCompletionPercentage(day) == 100;
       }).length;
 
       breakdown.add(
@@ -66,10 +65,10 @@ class HabitStatisticsService {
         ),
       );
 
-      for (final date in habit.completedDates) {
-        final normalized = _normalize(date);
-        if (normalized.isAfter(today) || normalized.isBefore(start)) continue;
-        heatmap[normalized] = (heatmap[normalized] ?? 0) + 1;
+      for (final day in days) {
+        if (habit.getCompletionPercentage(day) == 100) {
+          heatmap[day] = (heatmap[day] ?? 0) + 1;
+        }
       }
 
       final current = currentStreak(habit, today);
@@ -122,10 +121,13 @@ class HabitStatisticsService {
       DateTime(dateTime.year, dateTime.month, dateTime.day);
 
   static int _bestStreak(Habit habit) {
-    if (habit.completedDates.isEmpty) return 0;
+    if (habit.completionPercentage.isEmpty) return 0;
     
     final formatter = DateFormat.E();
-    final uniqueDates = habit.completedDates.map(_normalize).toSet().toList()
+    final uniqueDates = habit.completionPercentage.keys.map((key) {
+      final parts = key.split('-');
+      return DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+    }).toSet().toList()
       ..sort((a, b) => a.compareTo(b));
       
     int best = 0;
@@ -133,6 +135,8 @@ class HabitStatisticsService {
     DateTime? expectedNext;
 
     for (final date in uniqueDates) {
+      if (habit.getCompletionPercentage(date) < 100) continue;
+      
       if (expectedNext == null) {
         current = 1;
       } else {
@@ -159,16 +163,16 @@ class HabitStatisticsService {
   }
 
   static int currentStreak(Habit habit, DateTime referenceDate) {
-    if (habit.completedDates.isEmpty) return 0;
+    if (habit.completionPercentage.isEmpty) return 0;
     final formatter = DateFormat.E();
     
     int streak = 0;
     DateTime cursor = referenceDate;
 
-    if (!habit.completedDates.contains(cursor)) {
+    if (habit.getCompletionPercentage(cursor) < 100) {
       cursor = cursor.subtract(const Duration(days: 1));
       while (true) {
-        if (habit.completedDates.contains(cursor)) {
+        if (habit.getCompletionPercentage(cursor) == 100) {
           break;
         }
         if (habit.repeatDays.contains(formatter.format(cursor))) {
@@ -180,7 +184,7 @@ class HabitStatisticsService {
     }
 
     while (true) {
-      if (habit.completedDates.contains(cursor)) {
+      if (habit.getCompletionPercentage(cursor) == 100) {
         streak += 1;
       } else if (habit.repeatDays.contains(formatter.format(cursor))) {
         break; 

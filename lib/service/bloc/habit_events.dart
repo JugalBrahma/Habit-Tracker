@@ -56,3 +56,9 @@ class UpdateHabit extends HabitEvents {
     this.targetDays = 21,
   });
 }
+
+class UpdateHabitPercentage extends HabitEvents {
+  final String habitId;
+  final Map<String, int> completionPercentage;
+  UpdateHabitPercentage(this.habitId, this.completionPercentage);
+}

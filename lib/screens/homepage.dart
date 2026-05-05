@@ -78,9 +78,7 @@ class _HomepageState extends State<Homepage> {
                       final totalToday = scheduledHabits.length;
                       final doneToday = scheduledHabits
                           .where(
-                            (habit) => habit.completedDates.contains(
-                              normalizedSelected,
-                            ),
+                            (habit) => habit.getCompletionPercentage(normalizedSelected) == 100,
                           )
                           .length;
 
@@ -135,9 +133,7 @@ class _HomepageState extends State<Homepage> {
                                   const SizedBox(height: 12),
                               itemBuilder: (context, index) {
                                 final habit = scheduledHabits[index];
-                                final isDone = habit.completedDates.contains(
-                                  normalizedSelected,
-                                );
+                                final isDone = habit.getCompletionPercentage(normalizedSelected) == 100;
                                 final streak =
                                     HabitStatisticsService.currentStreak(
                                       habit,

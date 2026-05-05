@@ -4,7 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class Adhelper {
   // Use true for development to confirm implementation works.
   // Use false for production once your AdMob account is ready and app is approved.
-  static bool get isTestMode => false;
+  static bool get isTestMode => true;
 
   static String get bannerAdUnitId {
     if (isTestMode) {

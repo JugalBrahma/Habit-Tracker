@@ -40,6 +40,10 @@ class Habit {
   @HiveField(10)
   final List<DateTime> completedDates;
 
+  // Store completion percentage for each date (0-100)
+  @HiveField(11)
+  final Map<String, int> completionPercentage;
+
   Habit({
     required this.id,
     required this.name,
@@ -52,10 +56,12 @@ class Habit {
     this.isActive = true,
     this.targetDays = 21,
     List<DateTime>? completedDates,
+    Map<String, int>? completionPercentage,
   })  : reminderMinutes = reminderTime == null
             ? null
             : reminderTime.hour * 60 + reminderTime.minute,
-        completedDates = List<DateTime>.from(completedDates ?? const []);
+        completedDates = List<DateTime>.from(completedDates ?? const []),
+        completionPercentage = completionPercentage ?? {};
 
   TimeOfDay? get reminderTime => reminderMinutes == null
       ? null
@@ -65,6 +71,11 @@ class Habit {
         );
 
   Set<DateTime> get completedDateSet => completedDates.toSet();
+
+  int getCompletionPercentage(DateTime date) {
+    final dateKey = '${date.year}-${date.month}-${date.day}';
+    return completionPercentage[dateKey] ?? 0;
+  }
 
   Habit copyWith({
     String? name,
@@ -77,6 +88,7 @@ class Habit {
     bool? isActive,
     int? targetDays,
     Set<DateTime>? completedDates,
+    Map<String, int>? completionPercentage,
   }) {
     return Habit(
       id: id,
@@ -92,6 +104,7 @@ class Habit {
       completedDates: completedDates == null
           ? this.completedDates
           : completedDates.toList(),
+      completionPercentage: completionPercentage ?? this.completionPercentage,
     );
   }
 }

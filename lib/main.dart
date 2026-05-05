@@ -15,6 +15,7 @@ import 'package:hive_flutter/adapters.dart';
 
 import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
 import 'package:habit_tracker/adhelper.dart';
+import 'package:habit_tracker/screens/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,17 +90,21 @@ void main() async {
 
   final repo = HabitRepository();
 
+  final box = Hive.box('themePreferences');
+  final hasSeenOnboarding = box.get('hasSeenOnboarding', defaultValue: false);
+
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider(create: (_) => ThemeCubit())],
-      child: MyApp(repo: repo),
+      child: MyApp(repo: repo, hasSeenOnboarding: hasSeenOnboarding),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
   final HabitRepository repo;
-  const MyApp({super.key, required this.repo});
+  final bool hasSeenOnboarding;
+  const MyApp({super.key, required this.repo, required this.hasSeenOnboarding});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -115,10 +120,12 @@ class _MyAppState extends State<MyApp> {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
-          home: BlocProvider(
-            create: (context) => HabitService(widget.repo)..add(LoadHabit()),
-            child: Navigationpage(),
-          ),
+          home: widget.hasSeenOnboarding
+              ? BlocProvider(
+                  create: (context) => HabitService(widget.repo)..add(LoadHabit()),
+                  child: Navigationpage(),
+                )
+              : const OnboardingScreen(),
         );
       },
     );
