@@ -9,7 +9,7 @@ Habit Tracker is developed and maintained by Jugal Brahma (India). This short po
 
 What we collect
 
-- Advertisements: Served through Google AdMob. All ad requests are tagged for child-directed treatment to ensure privacy and safety.
+- Advertisements: Served through Google AdMob to support the development of the app.
 - Analytics: Basic usage data collected via Firebase Analytics to improve app performance and user experience. No personal identifiers are collected for marketing.
 - Habit data: Names, notes, reminders, completion history and settings. Stored locally (Hive). If you enable cloud sync, data is stored in Cloud Firestore.
 - Device info: App version and basic device model for troubleshooting.
@@ -17,7 +17,7 @@ What we collect
 What we do NOT collect
 
 - No sale of your personal data to third parties.
-- No behavioral tracking for children.
+- No sale of your personal data to third parties.
 
 Third-party services
 
@@ -35,9 +35,7 @@ Data deletion and retention
 
 Email jugalbrahma19@gmail.com to request deletion. Active data will be removed within 30 days; backups may remain for up to 90 days.
 
-Children
-
-Not intended for children under 13. Users under 18 should obtain parental consent where required by local law.
+Not intended for individuals under the age of 13. Users under 18 should obtain parental consent where required by local law.
 
 Your rights
 
@@ -94,7 +92,7 @@ Our App uses the following third-party services:
 
 ### 4.2 Google AdMob (Google)
 - **Advertisements:** Used to support the development of the app. 
-- **Privacy Policy compliance:** Ad requests are configured for child-directed treatment (COPPA/GDPR compliance).
+- **Privacy Policy compliance:** Ad requests are configured according to standard privacy guidelines.
 - **Privacy:** Google processes data according to their [Privacy Policy](https://policies.google.com/privacy)
 
 ### 4.2 Other Third Parties
@@ -163,11 +161,11 @@ To exercise these rights, please contact us using the information in Section 10.
 
 ---
 
-## 8. Children's Privacy
+## 8. Privacy of Minors
 
-Habit Tracker is designed to be safe for all family members. For users under 13, the app is configured to comply with the Children's Online Privacy Protection Act (COPPA). We do not collect personal information from children under 13 unless it is necessary for app functionality (like local habit storage), and we do not use behavioral advertising for children.
+Habit Tracker is intended for a general audience. We do not knowingly collect personal information from individuals under the age of 13. If we become aware that we have collected personal information from a child under 13, we will take steps to delete that information as soon as possible.
 
-For users between 13-18 (or the applicable age of digital consent in your jurisdiction), parental guidance is encouraged. All ad content is filtered to be suitable for general audiences (G rating).
+For users between 13-18 (or the applicable age of digital consent in your jurisdiction), parental guidance is encouraged.
 
 ---
 
