@@ -76,11 +76,9 @@ class _HomepageState extends State<Homepage> {
                           )
                           .toList();
                       final totalToday = scheduledHabits.length;
-                      final doneToday = scheduledHabits
-                          .where(
-                            (habit) => habit.getCompletionPercentage(normalizedSelected) == 100,
-                          )
-                          .length;
+                      final doneToday = scheduledHabits.isEmpty 
+                          ? 0.0 
+                          : scheduledHabits.fold(0.0, (sum, habit) => sum + (habit.getCompletionPercentage(normalizedSelected) / 100.0));
 
                       return Column(
                         children: [

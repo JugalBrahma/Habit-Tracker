@@ -44,6 +44,10 @@ class Habit {
   @HiveField(11)
   final Map<String, int> completionPercentage;
 
+  // Target duration per session in minutes (null = no time target)
+  @HiveField(12)
+  final int? targetMinutes;
+
   Habit({
     required this.id,
     required this.name,
@@ -57,6 +61,7 @@ class Habit {
     this.targetDays = 21,
     List<DateTime>? completedDates,
     Map<String, int>? completionPercentage,
+    this.targetMinutes,
   })  : reminderMinutes = reminderTime == null
             ? null
             : reminderTime.hour * 60 + reminderTime.minute,
@@ -89,6 +94,8 @@ class Habit {
     int? targetDays,
     Set<DateTime>? completedDates,
     Map<String, int>? completionPercentage,
+    int? targetMinutes,
+    bool clearTargetMinutes = false,
   }) {
     return Habit(
       id: id,
@@ -105,6 +112,7 @@ class Habit {
           ? this.completedDates
           : completedDates.toList(),
       completionPercentage: completionPercentage ?? this.completionPercentage,
+      targetMinutes: clearTargetMinutes ? null : (targetMinutes ?? this.targetMinutes),
     );
   }
 }

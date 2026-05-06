@@ -59,10 +59,44 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
   }
 
   @override
+  void didUpdateWidget(HomeHabitTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.habit != widget.habit || oldWidget.date != widget.date) {
+      _currentPercentage = widget.habit.getCompletionPercentage(widget.date);
+      _dragPosition = _currentPercentage / 100.0;
+    }
+  }
+
+  void _toggleSimpleHabit(bool isFuture) {
+    if (isFuture) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("\u{1F512} Can't edit future habits"),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    final newPercent = _currentPercentage == 100 ? 0 : 100;
+    setState(() {
+      _currentPercentage = newPercent;
+      _dragPosition = newPercent / 100.0;
+    });
+    context.read<HabitService>().add(
+      UpdateHabitPercentage(
+        widget.habit.id,
+        {'${widget.date.year}-${widget.date.month}-${widget.date.day}': newPercent},
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final icon = HomeHabitTile._kHabitIcons[widget.habit.iconName] ?? Icons.circle;
     final badgeColor = Color(widget.habit.color);
     final theme = Theme.of(context);
+    final isTimed = widget.habit.targetMinutes != null;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -75,98 +109,51 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
         return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
             title: const Text('Delete Habit?'),
-            content: Text(
-              'This will permanently delete "${widget.habit.name}" and all of its progress history. This cannot be undone.',
-            ),
+            content: Text('This will permanently delete "${widget.habit.name}".'),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Delete'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+              ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
             ],
           ),
         );
       },
-      onDismissed: (direction) {
-        context.read<HabitService>().add(DeleteHabit(widget.habit.id));
-        PremiumSnackBar.show(
-          context,
-          title: 'Habit Deleted',
-          message: '"${widget.habit.name}" has been removed.',
-          icon: Icons.delete_sweep_rounded,
-          backgroundColor: theme.colorScheme.error,
-        );
-      },
+      onDismissed: (direction) => context.read<HabitService>().add(DeleteHabit(widget.habit.id)),
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.error,
-          borderRadius: BorderRadius.circular(18),
-        ),
+        decoration: BoxDecoration(color: theme.colorScheme.error, borderRadius: BorderRadius.circular(18)),
         child: const Icon(Icons.delete_sweep_rounded, color: Colors.white),
       ),
       child: Material(
         color: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.6),
+              color: isFuture ? theme.colorScheme.onSurface.withOpacity(0.15) : theme.colorScheme.primary.withOpacity(0.6),
               width: 2.5,
             ),
           ),
+          foregroundDecoration: isFuture ? BoxDecoration(color: theme.colorScheme.surface.withOpacity(0.35), borderRadius: BorderRadius.circular(24)) : null,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BlocProvider.value(
-                              value: context.read<HabitService>(),
-                              child: UpdateHabitPage(habit: widget.habit),
-                            ),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => BlocProvider.value(value: context.read<HabitService>(), child: UpdateHabitPage(habit: widget.habit))));
                       },
-                      borderRadius: BorderRadius.circular(16),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: badgeColor.withOpacity(0.15),
-                              shape: BoxShape.circle,
-                            ),
+                            decoration: BoxDecoration(color: badgeColor.withOpacity(0.15), shape: BoxShape.circle),
                             child: Icon(icon, color: badgeColor, size: 24),
                           ),
                           const SizedBox(width: 16),
@@ -174,38 +161,12 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  widget.habit.name,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onSurface,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    decoration: widget.isDone
-                                        ? TextDecoration.lineThrough
-                                        : null,
-                                    decorationColor: theme.colorScheme.onSurface,
-                                    decorationThickness: 2.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.local_fire_department,
-                                      size: 14,
-                                      color: Colors.orange,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${widget.streak} Day Streak',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                Text(widget.habit.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, decoration: widget.isDone ? TextDecoration.lineThrough : null)),
+                                Text('${widget.streak} Day Streak', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+                                if (isTimed) ...[
+                                  const SizedBox(height: 2),
+                                  Text('Goal: ${widget.habit.targetMinutes}m', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)),
+                                ],
                               ],
                             ),
                           ),
@@ -213,127 +174,109 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
                   SizedBox(
-                    width: 56,
-                    height: 56,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
+                    width: 56, height: 56,
+                    child: InkWell(
+                      onTap: isTimed ? null : () => _toggleSimpleHabit(isFuture),
+                      borderRadius: BorderRadius.circular(28),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isFuture ? Colors.grey.shade100 : Colors.white,
+                              border: Border.all(color: isFuture ? Colors.grey.shade300 : badgeColor.withOpacity(0.15), width: 2),
+                            ),
                           ),
-                        ),
-                        CircularProgressIndicator(
-                          value: _dragPosition,
-                          strokeWidth: 6,
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            _currentPercentage == 100
-                                ? const Color(0xFF556B2F)
-                                : badgeColor,
+                          CircularProgressIndicator(
+                            value: isFuture ? 0 : _dragPosition,
+                            strokeWidth: 6,
+                            backgroundColor: Colors.transparent,
+                            valueColor: AlwaysStoppedAnimation<Color>(isFuture ? Colors.grey.shade300 : badgeColor),
                           ),
-                        ),
-                        Text(
-                          '$_currentPercentage%',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: _currentPercentage == 100
-                                ? const Color(0xFF556B2F)
-                                : badgeColor,
-                          ),
-                        ),
-                      ],
+                          if (isFuture) const Icon(Icons.lock_outline_rounded, size: 20, color: Colors.grey)
+                          else if (isTimed) Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('${(widget.habit.targetMinutes! * _currentPercentage / 100).round()}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: badgeColor)),
+                              Text('min', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurfaceVariant)),
+                            ],
+                          )
+                          else if (_currentPercentage == 100) const Icon(Icons.check_rounded, color: Color(0xFF556B2F), size: 24)
+                          else const SizedBox.shrink(),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  const barHeight = 4.0;
-                  final trackWidth = constraints.maxWidth;
-                  final handlePosition = _dragPosition * trackWidth;
+              if (isTimed) ...[
+                const SizedBox(height: 12),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    const barHeight = 4.0;
+                    final trackWidth = constraints.maxWidth;
+                    final handlePosition = _dragPosition * trackWidth;
 
-                  return GestureDetector(
-                    onHorizontalDragStart: (_) {
-                      if (isFuture) return;
-                    },
-                    onHorizontalDragUpdate: (details) {
-                      if (isFuture) return;
-                      setState(() {
-                        _dragPosition += details.delta.dx / trackWidth;
-                        _dragPosition = _dragPosition.clamp(0.0, 1.0);
-                        _currentPercentage = (_dragPosition * 100).round();
-                      });
-                    },
-                    onHorizontalDragEnd: (details) {
-                      if (isFuture) return;
-                      final dateKey = '${widget.date.year}-${widget.date.month}-${widget.date.day}';
-                      final updatedPercentages = Map<String, int>.from(widget.habit.completionPercentage);
-                      updatedPercentages[dateKey] = _currentPercentage;
-                      
-                      context.read<HabitService>().add(
-                        UpdateHabitPercentage(
-                          widget.habit.id,
-                          updatedPercentages,
-                        ),
-                      );
-                    },
-                    child: SizedBox(
-                      height: 24,
-                      child: Stack(
-                        alignment: Alignment.centerLeft,
-                        clipBehavior: Clip.none,
-                        children: [
-                          // Track background
-                          Container(
-                            height: barHeight,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(barHeight / 2),
+                    return GestureDetector(
+                      onHorizontalDragStart: (_) {
+                        if (isFuture) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("\u{1F512} Can't edit future habits"),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
                             ),
-                          ),
-                          
-                          // Progress fill
-                          Container(
-                            width: handlePosition.clamp(0.0, trackWidth),
-                            height: barHeight,
-                            decoration: BoxDecoration(
-                              color: _currentPercentage == 100
-                                  ? const Color(0xFF556B2F)
-                                  : badgeColor.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(barHeight / 2),
+                          );
+                          return;
+                        }
+                      },
+                      onHorizontalDragUpdate: (details) {
+                        if (isFuture) return;
+                        setState(() {
+                          _dragPosition = (_dragPosition + details.delta.dx / trackWidth).clamp(0.0, 1.0);
+                          _currentPercentage = (_dragPosition * 100).round();
+                        });
+                      },
+                      onHorizontalDragEnd: (details) {
+                        if (isFuture) return;
+                        context.read<HabitService>().add(UpdateHabitPercentage(widget.habit.id, {'${widget.date.year}-${widget.date.month}-${widget.date.day}': _currentPercentage}));
+                      },
+                      child: SizedBox(
+                        height: 24,
+                        child: Stack(
+                          alignment: Alignment.centerLeft,
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              height: barHeight,
+                              width: double.infinity,
+                              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(barHeight / 2)),
                             ),
-                          ),
-                          
-                          // Blue triangle handle
-                          Positioned(
-                            left: (handlePosition - 8).clamp(-4.0, trackWidth - 12),
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: CustomPaint(
-                                size: const Size(20, 20),
-                                painter: _SwipeIndicatorPainter(
-                                  color: _currentPercentage == 100
-                                      ? const Color(0xFF556B2F)
-                                      : badgeColor,
-                                  progress: _dragPosition,
+                            Container(
+                              width: handlePosition.clamp(0.0, trackWidth),
+                              height: barHeight,
+                              decoration: BoxDecoration(color: badgeColor, borderRadius: BorderRadius.circular(barHeight / 2)),
+                            ),
+                            Positioned(
+                              left: (handlePosition - 8).clamp(-4.0, trackWidth - 12),
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: CustomPaint(
+                                  size: const Size(20, 20),
+                                  painter: _SwipeIndicatorPainter(color: badgeColor, progress: _dragPosition),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
         ),
@@ -345,33 +288,20 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
 class _SwipeIndicatorPainter extends CustomPainter {
   final Color color;
   final double progress;
-
   _SwipeIndicatorPainter({required this.color, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
+    final paint = Paint()..color = color..style = PaintingStyle.fill;
     final path = Path();
-    final arrowWidth = 16.0;
-    final arrowHeight = 12.0;
-    
-    // Draw a chevron/arrow shape pointing right
     final centerY = size.height / 2;
-    final startX = 4.0;
-    
-    path.moveTo(startX, centerY - arrowHeight / 2);
-    path.lineTo(startX + arrowWidth, centerY);
-    path.lineTo(startX, centerY + arrowHeight / 2);
+    path.moveTo(4.0, centerY - 6);
+    path.lineTo(4.0 + 16, centerY);
+    path.lineTo(4.0, centerY + 6);
     path.close();
-
     canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(_SwipeIndicatorPainter oldDelegate) {
-    return oldDelegate.color != color || oldDelegate.progress != progress;
-  }
+  bool shouldRepaint(_SwipeIndicatorPainter oldDelegate) => oldDelegate.color != color || oldDelegate.progress != progress;
 }

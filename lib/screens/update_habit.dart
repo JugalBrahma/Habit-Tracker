@@ -9,6 +9,7 @@ import 'package:habit_tracker/screens/widgets/update_habit/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/repeat_days_selector.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/reminder_tile.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/goal_duration_selector.dart';
+import 'package:habit_tracker/screens/widgets/update_habit/time_goal_selector.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/update_form_fields.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/update_habit_button.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/activity_map.dart';
@@ -74,6 +75,7 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
   late String _selectedIconName;
   late Set<String> _selectedRepeatDays;
   late double _targetDays;
+  int? _targetMinutes;
   TimeOfDay? _reminderTime;
 
   @override
@@ -85,6 +87,7 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
     _selectedIconName = widget.habit.iconName;
     _selectedRepeatDays = Set<String>.from(widget.habit.repeatDays);
     _targetDays = widget.habit.targetDays.toDouble();
+    _targetMinutes = widget.habit.targetMinutes;
     _reminderTime = widget.habit.reminderTime;
   }
 
@@ -203,6 +206,12 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
                     selectedColor: _selectedColor,
                     onGoalChanged: (val) => setState(() => _targetDays = val),
                   ),
+                  const SizedBox(height: 24),
+                  TimeGoalSelector(
+                    targetMinutes: _targetMinutes,
+                    selectedColor: _selectedColor,
+                    onTimeGoalChanged: (val) => setState(() => _targetMinutes = val),
+                  ),
                   const SizedBox(height: 48),
                   UpdateHabitButton(
                     selectedColor: _selectedColor,
@@ -258,6 +267,7 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
         repeatDays: _selectedRepeatDays.toList(),
         reminderTime: _reminderTime,
         targetDays: _targetDays.round(),
+        targetMinutes: _targetMinutes,
       ),
     );
     Navigator.pop(context);

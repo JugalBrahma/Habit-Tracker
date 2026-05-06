@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class HomeProgressCard extends StatelessWidget {
-  final int done;
+  final double done;
   final int total;
   final DateTime selectedDate;
 
@@ -68,7 +68,9 @@ class HomeProgressCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    "$done of $total habits completed",
+                    total > 0 && done == total.toDouble() 
+                      ? "All habits completed!" 
+                      : "$total habits scheduled",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

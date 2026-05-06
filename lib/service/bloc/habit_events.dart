@@ -12,6 +12,7 @@ class AddHabit extends HabitEvents {
   final List<String> repeatDays;
   final TimeOfDay? reminderTime;
   final int targetDays;
+  final int? targetMinutes;
 
   AddHabit({
     required this.title,
@@ -21,6 +22,7 @@ class AddHabit extends HabitEvents {
     required this.repeatDays,
     this.reminderTime,
     this.targetDays = 21,
+    this.targetMinutes,
   });
 }
 
@@ -44,6 +46,7 @@ class UpdateHabit extends HabitEvents {
   final List<String> repeatDays;
   final TimeOfDay? reminderTime;
   final int targetDays;
+  final int? targetMinutes;
 
   UpdateHabit({
     required this.id,
@@ -54,6 +57,7 @@ class UpdateHabit extends HabitEvents {
     required this.repeatDays,
     this.reminderTime,
     this.targetDays = 21,
+    this.targetMinutes,
   });
 }
 

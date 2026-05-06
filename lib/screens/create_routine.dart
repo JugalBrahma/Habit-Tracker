@@ -8,6 +8,7 @@ import 'package:habit_tracker/screens/widgets/create_routine/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/repeat_days_selector.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/reminder_tile.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/goal_duration_selector.dart';
+import 'package:habit_tracker/screens/widgets/create_routine/time_goal_selector.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/routine_form_fields.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/create_habit_button.dart';
 
@@ -77,6 +78,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
     'Sun',
   };
   double _targetDays = 21;
+  int? _targetMinutes;
   TimeOfDay? _reminderTime;
 
   @override
@@ -176,6 +178,12 @@ class _CreateRoutineState extends State<CreateRoutine> {
                 selectedColor: _selectedColor,
                 onGoalChanged: (val) => setState(() => _targetDays = val),
               ),
+              const SizedBox(height: 24),
+              TimeGoalSelector(
+                targetMinutes: _targetMinutes,
+                selectedColor: _selectedColor,
+                onTimeGoalChanged: (val) => setState(() => _targetMinutes = val),
+              ),
               const SizedBox(height: 48),
               CreateHabitButton(
                 selectedColor: _selectedColor,
@@ -237,6 +245,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
         repeatDays: _selectedRepeatDays.toList(),
         reminderTime: _reminderTime,
         targetDays: _targetDays.round(),
+        targetMinutes: _targetMinutes,
       ),
     );
     Navigator.pop(context);

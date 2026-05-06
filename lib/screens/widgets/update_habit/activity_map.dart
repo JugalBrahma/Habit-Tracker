@@ -88,39 +88,66 @@ class ActivityMap extends StatelessWidget {
   Widget _buildDayCell(BuildContext context, DateTime date, bool isToday, bool isCompleted) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isFuture = date.isAfter(today);
 
     return GestureDetector(
-      onTap: () {
-        context.read<HabitService>().add(ToggleHabit(habit.id, date));
-      },
+      onTap: isFuture
+          ? () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("🔒 Can't edit future habits"),
+                  duration: Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          : () {
+              context.read<HabitService>().add(ToggleHabit(habit.id, date));
+            },
       child: Container(
         decoration: BoxDecoration(
-          color: isCompleted 
-              ? selectedColor 
-              : (isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]),
+          color: isFuture
+              ? (isDark ? Colors.white.withOpacity(0.04) : Colors.grey[100])
+              : isCompleted
+                  ? selectedColor
+                  : (isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]),
           borderRadius: BorderRadius.circular(8),
-          border: isToday 
-              ? Border.all(color: selectedColor, width: 2) 
+          border: isToday
+              ? Border.all(color: selectedColor, width: 2)
               : null,
-          boxShadow: isCompleted ? [
-            BoxShadow(
-              color: selectedColor.withOpacity(0.3),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            )
-          ] : [],
+          boxShadow: isCompleted && !isFuture
+              ? [
+                  BoxShadow(
+                    color: selectedColor.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : [],
         ),
         child: Center(
-          child: Text(
-            date.day.toString(),
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: isToday || isCompleted ? FontWeight.bold : FontWeight.normal,
-              color: isCompleted 
-                  ? Colors.white 
-                  : (isToday ? selectedColor : theme.colorScheme.onSurface.withOpacity(0.5)),
-            ),
-          ),
+          child: isFuture
+              ? Icon(
+                  Icons.lock_outline_rounded,
+                  size: 10,
+                  color: isDark
+                      ? Colors.white.withOpacity(0.2)
+                      : Colors.grey.shade400,
+                )
+              : Text(
+                  date.day.toString(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isToday || isCompleted ? FontWeight.bold : FontWeight.normal,
+                    color: isCompleted
+                        ? Colors.white
+                        : (isToday
+                            ? selectedColor
+                            : theme.colorScheme.onSurface.withOpacity(0.5)),
+                  ),
+                ),
         ),
       ),
     );

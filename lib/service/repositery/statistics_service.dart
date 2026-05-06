@@ -18,7 +18,7 @@ class HabitStatisticsService {
     );
 
     int scheduled = 0;
-    int completed = 0;
+    double completed = 0;
     final List<FlSpot> spots = [];
     final Map<DateTime, int> heatmap = {};
     final List<HabitBreakdown> breakdown = [];
@@ -31,11 +31,9 @@ class HabitStatisticsService {
           .where((habit) => habit.repeatDays.contains(weekday))
           .toList();
       scheduled += todaysHabits.length;
-      var doneToday = 0;
+      double doneToday = 0;
       for (final habit in todaysHabits) {
-        if (habit.getCompletionPercentage(day) == 100) {
-          doneToday += 1;
-        }
+        doneToday += habit.getCompletionPercentage(day) / 100.0;
       }
       completed += doneToday;
       final percent = todaysHabits.isEmpty
@@ -50,9 +48,9 @@ class HabitStatisticsService {
       final scheduledDays = days
           .where((day) => habit.repeatDays.contains(formatter.format(day)))
           .length;
-      final completedDays = days.where((day) {
-        return habit.getCompletionPercentage(day) == 100;
-      }).length;
+      final double completedDays = days.fold(0.0, (sum, day) {
+        return sum + (habit.getCompletionPercentage(day) / 100.0);
+      });
 
       breakdown.add(
         HabitBreakdown(
@@ -66,7 +64,10 @@ class HabitStatisticsService {
       );
 
       for (final day in days) {
-        if (habit.getCompletionPercentage(day) == 100) {
+        final progress = habit.getCompletionPercentage(day);
+        if (progress > 0) {
+          // You could potentially use the progress value here for color intensity if the heatmap supports it,
+          // but for now we'll just increment it to show activity.
           heatmap[day] = (heatmap[day] ?? 0) + 1;
         }
       }
@@ -107,7 +108,7 @@ class HabitStatisticsService {
 
     return StatisticsSnapshot(
       completionRate: completionRate,
-      completed: completed,
+      completed: completed.round(),
       scheduled: scheduled,
       trendSpots: spots,
       breakdown: breakdown,
@@ -135,7 +136,7 @@ class HabitStatisticsService {
     DateTime? expectedNext;
 
     for (final date in uniqueDates) {
-      if (habit.getCompletionPercentage(date) < 100) continue;
+      if (habit.getCompletionPercentage(date) <= 0) continue;
       
       if (expectedNext == null) {
         current = 1;
@@ -169,10 +170,10 @@ class HabitStatisticsService {
     int streak = 0;
     DateTime cursor = referenceDate;
 
-    if (habit.getCompletionPercentage(cursor) < 100) {
+    if (habit.getCompletionPercentage(cursor) <= 0) {
       cursor = cursor.subtract(const Duration(days: 1));
       while (true) {
-        if (habit.getCompletionPercentage(cursor) == 100) {
+        if (habit.getCompletionPercentage(cursor) > 0) {
           break;
         }
         if (habit.repeatDays.contains(formatter.format(cursor))) {
@@ -184,7 +185,7 @@ class HabitStatisticsService {
     }
 
     while (true) {
-      if (habit.getCompletionPercentage(cursor) == 100) {
+      if (habit.getCompletionPercentage(cursor) > 0) {
         streak += 1;
       } else if (habit.repeatDays.contains(formatter.format(cursor))) {
         break; 
