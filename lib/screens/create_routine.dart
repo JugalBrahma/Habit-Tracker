@@ -6,7 +6,7 @@ import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/color_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/repeat_days_selector.dart';
-import 'package:habit_tracker/screens/widgets/create_routine/reminder_tile.dart';
+
 import 'package:habit_tracker/screens/widgets/create_routine/goal_duration_selector.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/time_goal_selector.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/routine_form_fields.dart';
@@ -164,13 +164,6 @@ class _CreateRoutineState extends State<CreateRoutine> {
                 },
               ),
               const SizedBox(height: 12),
-              ReminderTile(
-                reminderTime: _reminderTime,
-                selectedColor: _selectedColor,
-                onReminderChanged: (time) =>
-                    setState(() => _reminderTime = time),
-              ),
-              const SizedBox(height: 24),
               _subHeader('Goal Duration', secondaryTextColor),
               const SizedBox(height: 12),
               GoalDurationSelector(

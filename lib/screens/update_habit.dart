@@ -7,7 +7,7 @@ import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/color_picker.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/repeat_days_selector.dart';
-import 'package:habit_tracker/screens/widgets/update_habit/reminder_tile.dart';
+
 import 'package:habit_tracker/screens/widgets/update_habit/goal_duration_selector.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/time_goal_selector.dart';
 import 'package:habit_tracker/screens/widgets/update_habit/update_form_fields.dart';
@@ -192,13 +192,6 @@ class _UpdateHabitPageState extends State<UpdateHabitPage> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  ReminderTile(
-                    reminderTime: _reminderTime,
-                    selectedColor: _selectedColor,
-                    onReminderChanged: (time) =>
-                        setState(() => _reminderTime = time),
-                  ),
-                  const SizedBox(height: 24),
                   _subHeader('Goal Duration', secondaryTextColor),
                   const SizedBox(height: 12),
                   GoalDurationSelector(

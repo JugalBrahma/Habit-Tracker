@@ -185,14 +185,15 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isFuture ? Colors.grey.shade100 : Colors.white,
-                              border: Border.all(color: isFuture ? Colors.grey.shade300 : badgeColor.withOpacity(0.15), width: 2),
+                              color: isFuture 
+                                  ? Colors.grey.shade100 
+                                  : Colors.white,
                             ),
                           ),
                           CircularProgressIndicator(
                             value: isFuture ? 0 : _dragPosition,
                             strokeWidth: 6,
-                            backgroundColor: Colors.transparent,
+                            backgroundColor: isFuture ? Colors.grey.shade200 : badgeColor.withOpacity(0.15),
                             valueColor: AlwaysStoppedAnimation<Color>(isFuture ? Colors.grey.shade300 : badgeColor),
                           ),
                           if (isFuture) const Icon(Icons.lock_outline_rounded, size: 20, color: Colors.grey)

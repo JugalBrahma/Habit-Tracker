@@ -91,7 +91,9 @@ void main() async {
   final repo = HabitRepository();
 
   final box = Hive.box('themePreferences');
-  final hasSeenOnboarding = box.get('hasSeenOnboarding', defaultValue: false);
+  // Reset onboarding status on every restart as requested by user
+  await box.put('hasSeenOnboarding', false);
+  const hasSeenOnboarding = false;
 
   runApp(
     MultiBlocProvider(

@@ -28,6 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       title: 'Build Better Habits',
       subtitle:
           'Transform your daily routines into lasting habits with personalized tracking and insights.',
+      quote: '"The secret of your future is hidden in your daily routine."',
       icon: Icons.auto_graph,
       iconColor: AppColors.primarySeed,
       gradientColors: [AppColors.drawerGradient1Start, AppColors.drawerGradient1End],
@@ -36,6 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       title: 'Track Your Streaks',
       subtitle:
           'Visualize your progress with beautiful heatmaps and keep your motivation burning strong.',
+      quote: '"Success is the sum of small efforts, repeated day in and day out."',
       icon: Icons.local_fire_department,
       iconColor: AppColors.fireOrange,
       gradientColors: [AppColors.fireOrange, AppColors.fireAmber],
@@ -44,9 +46,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       title: 'Stay Consistent',
       subtitle:
           'Smart reminders and milestone celebrations to help you stay on track every single day.',
+      quote: '"Small steps every day lead to big results."',
       icon: Icons.notifications_active,
       iconColor: AppColors.waterCyan,
       gradientColors: [AppColors.waterBlue, AppColors.waterCyan],
+    ),
+    _OnboardingPageData(
+      title: 'Stay Motivated',
+      subtitle:
+          'Your potential is endless. Go do what you were created to do.',
+      quote: '"Don\'t stop until you\'re proud."',
+      icon: Icons.rocket_launch,
+      iconColor: AppColors.primarySeedDark,
+      gradientColors: [AppColors.drawerGradient1Start, AppColors.primarySeedDark],
     ),
   ];
 
@@ -286,6 +298,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 class _OnboardingPageData {
   final String title;
   final String subtitle;
+  final String quote;
   final IconData icon;
   final Color iconColor;
   final List<Color> gradientColors;
@@ -293,6 +306,7 @@ class _OnboardingPageData {
   _OnboardingPageData({
     required this.title,
     required this.subtitle,
+    required this.quote,
     required this.icon,
     required this.iconColor,
     required this.gradientColors,
@@ -445,7 +459,7 @@ class _PageContent extends StatelessWidget {
                         height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text(
                       data.subtitle,
                       textAlign: TextAlign.center,
@@ -454,8 +468,32 @@ class _PageContent extends StatelessWidget {
                             ? Colors.white.withOpacity(0.75)
                             : Colors.black54,
                         fontSize: 16,
-                        height: 1.6,
+                        height: 1.5,
                         fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Motivational Quote
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: data.iconColor.withOpacity(isDark ? 0.1 : 0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: data.iconColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        data.quote,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : data.iconColor,
+                          fontSize: 15,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w500,
+                          height: 1.4,
+                        ),
                       ),
                     ),
                   ],
@@ -499,7 +537,7 @@ class _BackgroundBlobs extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Blob 1 - top left green
+          // Blob 1 - top left theme green
           AnimatedBuilder(
             animation: floatController,
             builder: (context, child) {
@@ -509,13 +547,13 @@ class _BackgroundBlobs extends StatelessWidget {
                 left: -60 + v * 30,
                 child: _Blob(
                   size: 300,
-                  color: AppColors.primarySeed.withOpacity(isDark ? 0.45 : 0.25),
+                  color: AppColors.primarySeed.withOpacity(isDark ? 0.4 : 0.2),
                   blur: 80,
                 ),
               );
             },
           ),
-          // Blob 2 - top right cyan
+          // Blob 2 - top right soft green/lime
           AnimatedBuilder(
             animation: floatController,
             builder: (context, child) {
@@ -525,13 +563,13 @@ class _BackgroundBlobs extends StatelessWidget {
                 right: -80 + v * 20,
                 child: _Blob(
                   size: 260,
-                  color: AppColors.waterCyan.withOpacity(isDark ? 0.35 : 0.2),
+                  color: AppColors.habitBreakdownSoft.withOpacity(isDark ? 0.3 : 0.15),
                   blur: 70,
                 ),
               );
             },
           ),
-          // Blob 3 - center orange
+          // Blob 3 - center theme green deep
           AnimatedBuilder(
             animation: floatController,
             builder: (context, child) {
@@ -541,13 +579,13 @@ class _BackgroundBlobs extends StatelessWidget {
                 left: size.width * 0.25 - v * 20,
                 child: _Blob(
                   size: 220,
-                  color: AppColors.fireOrange.withOpacity(isDark ? 0.3 : 0.15),
+                  color: AppColors.drawerGradient1Start.withOpacity(isDark ? 0.25 : 0.1),
                   blur: 90,
                 ),
               );
             },
           ),
-          // Blob 4 - bottom right purple
+          // Blob 4 - bottom right soft green
           AnimatedBuilder(
             animation: floatController,
             builder: (context, child) {
@@ -557,13 +595,13 @@ class _BackgroundBlobs extends StatelessWidget {
                 right: -40 - v * 20,
                 child: _Blob(
                   size: 280,
-                  color: AppColors.primarySeedDark.withOpacity(isDark ? 0.35 : 0.2),
+                  color: AppColors.primarySeedDark.withOpacity(isDark ? 0.35 : 0.15),
                   blur: 80,
                 ),
               );
             },
           ),
-          // Blob 5 - bottom left blue
+          // Blob 5 - bottom left subtle green
           AnimatedBuilder(
             animation: floatController,
             builder: (context, child) {
@@ -573,7 +611,7 @@ class _BackgroundBlobs extends StatelessWidget {
                 left: -50 + v * 30,
                 child: _Blob(
                   size: 200,
-                  color: AppColors.waterBlue.withOpacity(isDark ? 0.3 : 0.15),
+                  color: AppColors.primarySeed.withOpacity(isDark ? 0.2 : 0.1),
                   blur: 70,
                 ),
               );
