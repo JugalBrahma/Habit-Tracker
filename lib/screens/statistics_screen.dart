@@ -35,7 +35,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final primaryColor = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           'Statistics',

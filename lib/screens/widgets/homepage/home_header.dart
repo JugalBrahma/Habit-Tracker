@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:habit_tracker/adhelper.dart';
 
-import 'package:habit_tracker/screens/config/theme/theme_cubit.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:habit_tracker/adhelper.dart';
 
 class HomeHeader extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -32,7 +29,8 @@ class _HomeHeaderState extends State<HomeHeader> {
           }
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint("Failed to load banner ad: ${error.message} (Code: ${error.code})");
+          debugPrint(
+              "Failed to load banner ad: ${error.message} (Code: ${error.code})");
           ad.dispose();
           if (mounted) {
             setState(() {
@@ -62,37 +60,58 @@ class _HomeHeaderState extends State<HomeHeader> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                onPressed: () {
-                  widget.scaffoldKey.currentState?.openDrawer();
-                },
-                icon: Icon(
-                  Icons.menu,
+              Text(
+                'HabitFlow.',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  final isDark = Theme.of(context).brightness == Brightness.dark;
-                  FirebaseAnalytics.instance.logEvent(
-                    name: 'theme_toggle',
-                    parameters: {
-                      'from_theme': isDark ? 'dark' : 'light',
-                      'to_theme': isDark ? 'light' : 'dark',
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      // Notification action
                     },
-                  );
-                  context.read<ThemeCubit>().toggleTheme();
-                },
-                icon: Icon(
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Icons.light_mode
-                      : Icons.dark_mode,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                    icon: Icon(
+                      Icons.notifications_outlined,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.2),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.4),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'JB',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

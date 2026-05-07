@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 
 class StatsActivityMap extends StatelessWidget {
@@ -26,13 +27,11 @@ class StatsActivityMap extends StatelessWidget {
       const Color(0xFF76B900),                   // full bright Nvidia green
     ];
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor),
-      ),
+      blur: 15,
+      opacity: 0.1,
+      borderRadius: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 import 'dart:math' as math;
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
 import 'package:habit_tracker/screens/config/colors/app_colors.dart';
@@ -25,20 +26,11 @@ class StatsStreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: _fireOrange.withOpacity(isDark ? 0.05 : 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      blur: 15,
+      opacity: 0.1,
+      borderRadius: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 
 class StatsOverallCard extends StatelessWidget {
   final StatisticsSnapshot snapshot;
@@ -16,29 +17,13 @@ class StatsOverallCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
+    return GlassContainer(
       width: double.infinity,
       height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          colors: isDark
-              ? [
-                  theme.colorScheme.primary.withOpacity(0.8),
-                  theme.colorScheme.tertiary.withOpacity(0.8),
-                ]
-              : [theme.colorScheme.primary, theme.colorScheme.tertiary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(isDark ? 0.08 : 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+      blur: 20,
+      opacity: 0.15,
+      borderRadius: 24,
+      color: theme.colorScheme.primary,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Stack(

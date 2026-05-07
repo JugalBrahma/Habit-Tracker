@@ -52,7 +52,7 @@ class HomeDateSelector extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
+                    : (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white),
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: isSelected
                     ? [

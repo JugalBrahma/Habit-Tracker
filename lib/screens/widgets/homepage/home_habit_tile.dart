@@ -4,7 +4,7 @@ import 'package:habit_tracker/screens/update_habit.dart';
 import 'package:habit_tracker/service/bloc/habit_events.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
 import 'package:habit_tracker/service/model/user_model.dart';
-import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 
 class HomeHabitTile extends StatefulWidget {
   final Habit habit;
@@ -84,16 +84,32 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
       _dragPosition = newPercent / 100.0;
     });
     context.read<HabitService>().add(
-      UpdateHabitPercentage(
-        widget.habit.id,
-        {'${widget.date.year}-${widget.date.month}-${widget.date.day}': newPercent},
-      ),
-    );
+          UpdateHabitPercentage(
+            widget.habit.id,
+            {
+              '${widget.date.year}-${widget.date.month}-${widget.date.day}':
+                  newPercent
+            },
+          ),
+        );
+  }
+
+  String _getFrequencyLabel(List<String> repeatDays) {
+    if (repeatDays.isEmpty) return 'Not scheduled';
+    if (repeatDays.length == 7) return 'Daily';
+    if (repeatDays.length == 5 &&
+        !repeatDays.contains('Sat') &&
+        !repeatDays.contains('Sun')) return 'Weekdays';
+    if (repeatDays.length == 2 &&
+        repeatDays.contains('Sat') &&
+        repeatDays.contains('Sun')) return 'Weekends';
+    return repeatDays.take(2).join(', ');
   }
 
   @override
   Widget build(BuildContext context) {
-    final icon = HomeHabitTile._kHabitIcons[widget.habit.iconName] ?? Icons.circle;
+    final icon =
+        HomeHabitTile._kHabitIcons[widget.habit.iconName] ?? Icons.circle;
     final badgeColor = Color(widget.habit.color);
     final theme = Theme.of(context);
     final isTimed = widget.habit.targetMinutes != null;
@@ -109,176 +125,286 @@ class _HomeHabitTileState extends State<HomeHabitTile> {
         return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
             title: const Text('Delete Habit?'),
-            content: Text('This will permanently delete "${widget.habit.name}".'),
+            content:
+                Text('This will permanently delete "${widget.habit.name}".'),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-              ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel')),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete')),
             ],
           ),
         );
       },
-      onDismissed: (direction) => context.read<HabitService>().add(DeleteHabit(widget.habit.id)),
+      onDismissed: (direction) =>
+          context.read<HabitService>().add(DeleteHabit(widget.habit.id)),
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
-        decoration: BoxDecoration(color: theme.colorScheme.error, borderRadius: BorderRadius.circular(18)),
+        decoration: BoxDecoration(
+            color: theme.colorScheme.error,
+            borderRadius: BorderRadius.circular(18)),
         child: const Icon(Icons.delete_sweep_rounded, color: Colors.white),
       ),
       child: Material(
         color: Colors.transparent,
-        child: Container(
+        child: GlassContainer(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: isFuture ? theme.colorScheme.onSurface.withOpacity(0.15) : theme.colorScheme.primary.withOpacity(0.6),
-              width: 2.5,
+          blur: 15,
+          opacity: 0.1,
+          borderRadius: 24,
+          border: Border(
+            left: BorderSide(
+              color: badgeColor,
+              width: 5,
+            ),
+            top: BorderSide(
+              color: isFuture
+                  ? Colors.white.withOpacity(0.1)
+                  : Color(widget.habit.color).withOpacity(0.5),
+              width: 1.5,
+            ),
+            right: BorderSide(
+              color: isFuture
+                  ? Colors.white.withOpacity(0.1)
+                  : Color(widget.habit.color).withOpacity(0.5),
+              width: 1.5,
+            ),
+            bottom: BorderSide(
+              color: isFuture
+                  ? Colors.white.withOpacity(0.1)
+                  : Color(widget.habit.color).withOpacity(0.5),
+              width: 1.5,
             ),
           ),
-          foregroundDecoration: isFuture ? BoxDecoration(color: theme.colorScheme.surface.withOpacity(0.35), borderRadius: BorderRadius.circular(24)) : null,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => BlocProvider.value(value: context.read<HabitService>(), child: UpdateHabitPage(habit: widget.habit))));
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: badgeColor.withOpacity(0.15), shape: BoxShape.circle),
-                            child: Icon(icon, color: badgeColor, size: 24),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(widget.habit.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, decoration: widget.isDone ? TextDecoration.lineThrough : null)),
-                                Text('${widget.streak} Day Streak', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
-                                if (isTimed) ...[
-                                  const SizedBox(height: 2),
-                                  Text('Goal: ${widget.habit.targetMinutes}m', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 56, height: 56,
-                    child: InkWell(
-                      onTap: isTimed ? null : () => _toggleSimpleHabit(isFuture),
-                      borderRadius: BorderRadius.circular(28),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isFuture 
-                                  ? Colors.grey.shade100 
-                                  : Colors.white,
-                            ),
-                          ),
-                          CircularProgressIndicator(
-                            value: isFuture ? 0 : _dragPosition,
-                            strokeWidth: 6,
-                            backgroundColor: isFuture ? Colors.grey.shade200 : badgeColor.withOpacity(0.15),
-                            valueColor: AlwaysStoppedAnimation<Color>(isFuture ? Colors.grey.shade300 : badgeColor),
-                          ),
-                          if (isFuture) const Icon(Icons.lock_outline_rounded, size: 20, color: Colors.grey)
-                          else if (isTimed) Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('${(widget.habit.targetMinutes! * _currentPercentage / 100).round()}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: badgeColor)),
-                              Text('min', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w500, color: theme.colorScheme.onSurfaceVariant)),
-                            ],
-                          )
-                          else if (_currentPercentage == 100) const Icon(Icons.check_rounded, color: Color(0xFF556B2F), size: 24)
-                          else const SizedBox.shrink(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (isTimed) ...[
-                const SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    const barHeight = 4.0;
-                    final trackWidth = constraints.maxWidth;
-                    final handlePosition = _dragPosition * trackWidth;
-
-                    return GestureDetector(
-                      onHorizontalDragStart: (_) {
-                        if (isFuture) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("\u{1F512} Can't edit future habits"),
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                          return;
-                        }
-                      },
-                      onHorizontalDragUpdate: (details) {
-                        if (isFuture) return;
-                        setState(() {
-                          _dragPosition = (_dragPosition + details.delta.dx / trackWidth).clamp(0.0, 1.0);
-                          _currentPercentage = (_dragPosition * 100).round();
-                        });
-                      },
-                      onHorizontalDragEnd: (details) {
-                        if (isFuture) return;
-                        context.read<HabitService>().add(UpdateHabitPercentage(widget.habit.id, {'${widget.date.year}-${widget.date.month}-${widget.date.day}': _currentPercentage}));
-                      },
-                      child: SizedBox(
-                        height: 24,
-                        child: Stack(
-                          alignment: Alignment.centerLeft,
-                          clipBehavior: Clip.none,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => BlocProvider.value(
+                                      value: context.read<HabitService>(),
+                                      child: UpdateHabitPage(
+                                          habit: widget.habit))));
+                        },
+                        child: Row(
                           children: [
                             Container(
-                              height: barHeight,
-                              width: double.infinity,
-                              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(barHeight / 2)),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                  color: badgeColor.withOpacity(0.15),
+                                  shape: BoxShape.circle),
+                              child: Icon(icon, color: badgeColor, size: 24),
                             ),
-                            Container(
-                              width: handlePosition.clamp(0.0, trackWidth),
-                              height: barHeight,
-                              decoration: BoxDecoration(color: badgeColor, borderRadius: BorderRadius.circular(barHeight / 2)),
-                            ),
-                            Positioned(
-                              left: (handlePosition - 8).clamp(-4.0, trackWidth - 12),
-                              top: 0,
-                              bottom: 0,
-                              child: Center(
-                                child: CustomPaint(
-                                  size: const Size(20, 20),
-                                  painter: _SwipeIndicatorPainter(color: badgeColor, progress: _dragPosition),
-                                ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(widget.habit.name,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          decoration: widget.isDone
+                                              ? TextDecoration.lineThrough
+                                              : null)),
+                                  const SizedBox(height: 2),
+                                  if (isTimed)
+                                    Text(
+                                      '${widget.habit.reminderTime?.format(context) ?? "Anytime"} · ${widget.habit.targetMinutes}m',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant),
+                                    )
+                                  else
+                                    Text(
+                                      _getFrequencyLabel(
+                                          widget.habit.repeatDays),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant),
+                                    ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${_currentPercentage}% done',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '🔥 ${widget.streak} days',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    );
-                  },
+                    ),
+                    SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: InkWell(
+                        onTap:
+                            isTimed ? null : () => _toggleSimpleHabit(isFuture),
+                        borderRadius: BorderRadius.circular(28),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isFuture
+                                    ? Colors.grey.shade100
+                                    : Colors.white,
+                              ),
+                            ),
+                            CircularProgressIndicator(
+                              value: isFuture ? 0 : _dragPosition,
+                              strokeWidth: 6,
+                              backgroundColor: isFuture
+                                  ? Colors.grey.shade200
+                                  : badgeColor.withOpacity(0.15),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  isFuture ? Colors.grey.shade300 : badgeColor),
+                            ),
+                            if (isFuture)
+                              const Icon(Icons.lock_outline_rounded,
+                                  size: 20, color: Colors.grey)
+                            else if (isTimed)
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      '${(widget.habit.targetMinutes! * _currentPercentage / 100).round()}',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: badgeColor)),
+                                  Text('min',
+                                      style: TextStyle(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w500,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant)),
+                                ],
+                              )
+                            else if (_currentPercentage == 100)
+                              const Icon(Icons.check_rounded,
+                                  color: Color(0xFF556B2F), size: 24)
+                            else
+                              const SizedBox.shrink(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                if (isTimed) ...[
+                  const SizedBox(height: 12),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      const barHeight = 4.0;
+                      final trackWidth = constraints.maxWidth;
+                      final handlePosition = _dragPosition * trackWidth;
+
+                      return GestureDetector(
+                        onHorizontalDragStart: (_) {
+                          if (isFuture) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text("\u{1F512} Can't edit future habits"),
+                                duration: Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                            return;
+                          }
+                        },
+                        onHorizontalDragUpdate: (details) {
+                          if (isFuture) return;
+                          setState(() {
+                            _dragPosition =
+                                (_dragPosition + details.delta.dx / trackWidth)
+                                    .clamp(0.0, 1.0);
+                            _currentPercentage = (_dragPosition * 100).round();
+                          });
+                        },
+                        onHorizontalDragEnd: (details) {
+                          if (isFuture) return;
+                          context
+                              .read<HabitService>()
+                              .add(UpdateHabitPercentage(widget.habit.id, {
+                                '${widget.date.year}-${widget.date.month}-${widget.date.day}':
+                                    _currentPercentage
+                              }));
+                        },
+                        child: SizedBox(
+                          height: 24,
+                          child: Stack(
+                            alignment: Alignment.centerLeft,
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                height: barHeight,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius:
+                                        BorderRadius.circular(barHeight / 2)),
+                              ),
+                              Container(
+                                width: handlePosition.clamp(0.0, trackWidth),
+                                height: barHeight,
+                                decoration: BoxDecoration(
+                                    color: badgeColor,
+                                    borderRadius:
+                                        BorderRadius.circular(barHeight / 2)),
+                              ),
+                              Positioned(
+                                left: (handlePosition - 8)
+                                    .clamp(-4.0, trackWidth - 12),
+                                top: 0,
+                                bottom: 0,
+                                child: Center(
+                                  child: CustomPaint(
+                                    size: const Size(20, 20),
+                                    painter: _SwipeIndicatorPainter(
+                                        color: badgeColor,
+                                        progress: _dragPosition),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -293,7 +419,9 @@ class _SwipeIndicatorPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     final path = Path();
     final centerY = size.height / 2;
     path.moveTo(4.0, centerY - 6);
@@ -304,5 +432,6 @@ class _SwipeIndicatorPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SwipeIndicatorPainter oldDelegate) => oldDelegate.color != color || oldDelegate.progress != progress;
+  bool shouldRepaint(_SwipeIndicatorPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.progress != progress;
 }

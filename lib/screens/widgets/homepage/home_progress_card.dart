@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 
 class HomeProgressCard extends StatelessWidget {
   final double done;
@@ -17,30 +18,15 @@ class HomeProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double progress = total > 0 ? done / total : 0;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    int doneCount = done.toInt();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
+      child: GlassContainer(
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: isDark 
-              ? theme.colorScheme.surfaceContainerHighest 
-              : Colors.white,
-          borderRadius: BorderRadius.circular(28),
-          border: isDark 
-              ? Border.all(color: Colors.white.withOpacity(0.05), width: 1.5) 
-              : Border.all(color: Colors.transparent, width: 1.5),
-          boxShadow: isDark 
-              ? [] 
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-        ),
+        blur: 15,
+        opacity: 0.1,
+        borderRadius: 28,
         child: Row(
           children: [
             Expanded(
@@ -48,12 +34,15 @@ class HomeProgressCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat('EEEE, MMM d').format(selectedDate).toUpperCase(),
+                    DateFormat('EEEE, MMM d')
+                        .format(selectedDate)
+                        .toUpperCase(),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                      color:
+                          theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -68,14 +57,29 @@ class HomeProgressCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    total > 0 && done == total.toDouble() 
-                      ? "All habits completed!" 
-                      : "$total habits scheduled",
+                    "Today's Progress",
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary.withOpacity(0.8),
+                      color: Colors.white70,
                     ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "$doneCount / $total done",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  LinearProgressIndicator(
+                    value: total > 0 ? done / total : 0,
+                    minHeight: 6,
+                    backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary),
                   ),
                 ],
               ),
@@ -90,8 +94,10 @@ class HomeProgressCard extends StatelessWidget {
                   child: CircularProgressIndicator(
                     value: progress,
                     strokeWidth: 10,
-                    backgroundColor: theme.colorScheme.primary.withOpacity(0.15),
-                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                    backgroundColor:
+                        theme.colorScheme.primary.withOpacity(0.15),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary),
                     strokeCap: StrokeCap.round,
                   ),
                 ),
