@@ -5,7 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:habit_tracker/adhelper.dart';
 import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
-import 'package:habit_tracker/screens/background_gallery/background_gallery_screen.dart';
+
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
@@ -145,33 +145,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
                       _showAboutDialog(context);
                     },
                   ),
-                  const SizedBox(height: 12),
-                  _buildPremiumTile(
-                    context,
-                    icon: Icons.image_rounded,
-                    title: 'Background Gallery',
-                    subtitle: 'Choose custom background image',
-                    gradient: const [AppColors.drawerGradient1Start, AppColors.drawerGradient1End],
-                    onTap: () {
-                      FirebaseAnalytics.instance.logEvent(name: 'drawer_background_gallery_click');
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BackgroundGalleryScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _buildPremiumTile(
-                    context,
-                    icon: Icons.workspace_premium_rounded,
-                    title: _isAdLoading ? 'Loading Ad...' : 'Remove Ads (24h)',
-                    subtitle: 'Watch a short ad to disable banners',
-                    gradient: const [Color(0xFFFF9800), Color(0xFFFF5722)],
-                    onTap: _isAdLoading ? () {} : _loadRewardedAd,
-                  ),
+
+                  if (!Adhelper.areAdsDisabled()) ...[
+                    const SizedBox(height: 12),
+                    _buildPremiumTile(
+                      context,
+                      icon: Icons.workspace_premium_rounded,
+                      title: _isAdLoading ? 'Loading Ad...' : 'Remove Ads (24h)',
+                      subtitle: 'Watch a short ad to disable banners',
+                      gradient: const [Color(0xFFFF9800), Color(0xFFFF5722)],
+                      onTap: _isAdLoading ? () {} : _loadRewardedAd,
+                    ),
+                  ],
                 ],
               ),
             ),

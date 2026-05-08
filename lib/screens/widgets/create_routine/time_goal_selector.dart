@@ -78,36 +78,113 @@ class TimeGoalSelector extends StatelessWidget {
             ],
           ),
           if (targetMinutes != null) ...[
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${targetMinutes} minutes',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: primaryColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: primaryColor,
-                inactiveTrackColor: primaryColor.withOpacity(0.1),
-                thumbColor: Colors.white,
-                overlayColor: primaryColor.withOpacity(0.2),
-                trackHeight: 6,
-              ),
-              child: Slider(
-                min: 5,
-                max: 240,
-                divisions: 47,
-                value: targetMinutes!.toDouble(),
-                onChanged: (val) => onTimeGoalChanged(val.round()),
-              ),
+            const SizedBox(height: 20),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final progress = (targetMinutes! - 5) / (240 - 5);
+                
+                return Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Target: ${targetMinutes}m',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: primaryColor,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          'Max: 4h',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onHorizontalDragUpdate: (details) {
+                        final localPos = details.localPosition.dx;
+                        final newProgress = (localPos / width).clamp(0.0, 1.0);
+                        final newMinutes = (5 + newProgress * (240 - 5)).round();
+                        onTimeGoalChanged(newMinutes);
+                      },
+                      onTapDown: (details) {
+                        final localPos = details.localPosition.dx;
+                        final newProgress = (localPos / width).clamp(0.0, 1.0);
+                        final newMinutes = (5 + newProgress * (240 - 5)).round();
+                        onTimeGoalChanged(newMinutes);
+                      },
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        clipBehavior: Clip.none,
+                        children: [
+                          // Background "Track"
+                          Container(
+                            height: 14,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(7),
+                              border: Border.all(
+                                color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                              ),
+                            ),
+                          ),
+                          // Loading Bar Fill
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            height: 14,
+                            width: width * progress,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  primaryColor,
+                                  primaryColor.withOpacity(0.7),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(7),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: primaryColor.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Interative Thumb (Glassy)
+                          Positioned(
+                            left: (width * progress) - 10,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: primaryColor, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ],

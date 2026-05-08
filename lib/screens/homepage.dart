@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 import 'package:habit_tracker/screens/create_routine.dart';
 import 'package:habit_tracker/service/bloc/habit_state.dart';
 import 'package:habit_tracker/service/repositery/habit_service.dart';
@@ -67,7 +68,7 @@ class _HomepageState extends State<Homepage> {
                         _selectedDate.month,
                         _selectedDate.day,
                       );
-                      final weekdayLabel = DateFormat.E().format(
+                      final weekdayLabel = DateFormat.E('en_US').format(
                         normalizedSelected,
                       );
                       final scheduledHabits = state.habits
@@ -76,9 +77,15 @@ class _HomepageState extends State<Homepage> {
                           )
                           .toList();
                       final totalToday = scheduledHabits.length;
-                      final doneToday = scheduledHabits.isEmpty 
-                          ? 0.0 
-                          : scheduledHabits.fold(0.0, (sum, habit) => sum + (habit.getCompletionPercentage(normalizedSelected) / 100.0));
+                      final doneToday = scheduledHabits.isEmpty
+                          ? 0.0
+                          : scheduledHabits.fold(
+                              0.0,
+                              (sum, habit) =>
+                                  sum +
+                                  (habit.getCompletionPercentage(
+                                          normalizedSelected) /
+                                      100.0));
 
                       return Column(
                         children: [
@@ -87,7 +94,7 @@ class _HomepageState extends State<Homepage> {
                             total: totalToday,
                             selectedDate: _selectedDate,
                           ),
-                          SizedBox(height: isTablet ? 30.0 : 24.0),
+                          const SizedBox(height: 16),
                           HomeDateSelector(
                             startDate: startDate,
                             selectedDate: _selectedDate,
@@ -97,7 +104,50 @@ class _HomepageState extends State<Homepage> {
                               });
                             },
                           ),
-                          SizedBox(height: isTablet ? 30.0 : 20.0),
+                          const SizedBox(height: 12),
+                          // Category Filters (from Swift Spec)
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                _buildFilterPill("All", isSelected: true),
+                                _buildFilterPill("Morning"),
+                                _buildFilterPill("Health"),
+                                _buildFilterPill("Mind"),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // "My Habits" Section (from Swift Spec)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "My Habits",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.18),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                  ),
+                                  child: const Icon(Icons.tune_rounded, size: 16, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           if (totalToday == 0)
                             Padding(
                               padding: const EdgeInsets.only(top: 40),
@@ -105,14 +155,18 @@ class _HomepageState extends State<Homepage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.event_busy,
-                                    size: 64,
-                                    color: Colors.grey[300],
+                                    Icons.eco_rounded,
+                                    size: 80,
+                                    color: Colors.white.withOpacity(0.1),
                                   ),
                                   const SizedBox(height: 16),
-                                  const Text(
-                                    "No routines scheduled today",
-                                    style: TextStyle(color: Colors.grey),
+                                  Text(
+                                    "No habits scheduled for this day",
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.4),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -121,22 +175,22 @@ class _HomepageState extends State<Homepage> {
                             ListView.separated(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.only(
-                                left: horizontalPadding,
-                                right: horizontalPadding,
-                                bottom: 100,
-                              ),
+                              padding: const EdgeInsets.only(bottom: 120),
                               itemCount: scheduledHabits.length,
                               separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 12),
+                                  const SizedBox(
+                                      height:
+                                          0), // Spacing is in the tile margin
                               itemBuilder: (context, index) {
                                 final habit = scheduledHabits[index];
-                                final isDone = habit.getCompletionPercentage(normalizedSelected) == 100;
+                                final isDone = habit.getCompletionPercentage(
+                                        normalizedSelected) ==
+                                    100;
                                 final streak =
                                     HabitStatisticsService.currentStreak(
-                                      habit,
-                                      normalizedSelected,
-                                    );
+                                  habit,
+                                  normalizedSelected,
+                                );
                                 return HomeHabitTile(
                                   habit: habit,
                                   isDone: isDone,
@@ -145,7 +199,6 @@ class _HomepageState extends State<Homepage> {
                                 );
                               },
                             ),
-                          const SizedBox(height: 180),
                         ],
                       );
                     }
@@ -158,8 +211,9 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90),
+        padding: const EdgeInsets.only(bottom: 110),
         child: FloatingActionButton(
+          backgroundColor: AppColors.premiumGreenIndicator,
           onPressed: () {
             FirebaseAnalytics.instance.logEvent(name: 'create_habit_click');
             controller.clear();
@@ -173,7 +227,31 @@ class _HomepageState extends State<Homepage> {
               ),
             );
           },
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add, color: Colors.black, size: 30),
+        ),
+      ),
+    );
+  }
+  Widget _buildFilterPill(String title, {bool isSelected = false}) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected 
+          ? AppColors.premiumGreenIndicator.withOpacity(0.4) 
+          : const Color(0xFFE2E3D8).withOpacity(0.12), // Ivory tint from Swift Spec
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isSelected ? AppColors.premiumGreenIndicator.withOpacity(0.5) : Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+          fontSize: 13,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
         ),
       ),
     );

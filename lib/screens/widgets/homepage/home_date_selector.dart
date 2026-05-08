@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/config/colors/app_colors.dart';
 import 'package:intl/intl.dart';
 
 class HomeDateSelector extends StatelessWidget {
@@ -15,27 +16,16 @@ class HomeDateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isLandscape = size.width > size.height;
-    final isTablet = size.width > 600;
-    final itemWidth = isTablet
-        ? 80.0
-        : (isLandscape ? 64.0 : size.width * 0.14);
-    // Use fixed heights to prevent collapse in landscape mode
-    final containerHeight = isTablet ? 100.0 : (isLandscape ? 72.0 : 88.0);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: SizedBox(
-        height: containerHeight,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.antiAlias, // Ensures items get clipped at the scroll container edge
-          itemCount: 7,
-          itemBuilder: (context, index) {
-            final date = startDate.add(Duration(days: index));
-          final isSelected =
-              date.year == selectedDate.year &&
+    return Container(
+      height: 44,
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 14, // Show 2 weeks
+        itemBuilder: (context, index) {
+          final date = startDate.add(Duration(days: index));
+          final isSelected = date.year == selectedDate.year &&
               date.month == selectedDate.month &&
               date.day == selectedDate.day;
 
@@ -43,60 +33,56 @@ class HomeDateSelector extends StatelessWidget {
             onTap: () => onDateSelected(date),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              width: itemWidth,
-              constraints: BoxConstraints(
-                minWidth: 50.0,
-                maxWidth: isTablet ? 100.0 : 90.0,
-              ),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: 85,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white),
-                borderRadius: BorderRadius.circular(18),
+                gradient: isSelected
+                    ? LinearGradient(
+                        colors: [
+                          AppColors.premiumSelectionBlue,
+                          AppColors.premiumSelectionBlue.withOpacity(0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.1),
+                          Colors.white.withOpacity(0.03),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: Colors.white.withOpacity(isSelected ? 0.3 : 0.1),
+                  width: 1.0,
+                ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.3),
+                          color: AppColors.premiumSelectionBlue.withOpacity(0.2),
                           blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
+                          offset: const Offset(0, 3),
+                        )
                       ]
                     : [],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    DateFormat.E().format(date),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected
-                          ? Colors.white
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+              child: Center(
+                child: Text(
+                  "${DateFormat.E('en_US').format(date)} ${DateFormat.d().format(date)}",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: Colors.white.withOpacity(isSelected ? 1.0 : 0.7),
+                    letterSpacing: 0.3,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    DateFormat.d().format(date),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected
-                          ? Colors.white
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           );
         },
       ),
-    ),
-  );
-}
+    );
+  }
 }

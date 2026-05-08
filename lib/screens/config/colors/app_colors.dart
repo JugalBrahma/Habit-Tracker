@@ -40,4 +40,10 @@ class AppColors {
   static const Color fireOrange = Color(0xFFFF6D00);
   static const Color fireAmber = Color(0xFFFFAB00);
   static const Color fireRed = Color(0xFFFF3D00);
+
+  // Premium Nature Theme
+  static const Color premiumGreenBackground = Color(0xFF1B4332); // Deep forest green
+  static const Color premiumGreenIndicator = Color(0xFF74C365); // Vibrant leaf green
+  static const Color premiumGreenSoft = Color(0xFF95D5B2);
+  static const Color premiumSelectionBlue = Color(0xFF4A90E2);
 }

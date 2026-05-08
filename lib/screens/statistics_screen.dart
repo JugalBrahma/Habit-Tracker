@@ -22,144 +22,102 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    final scaffoldBg = theme.scaffoldBackgroundColor;
-    final cardBg =
-        theme.cardTheme.color ??
-        (isDark ? colorScheme.surfaceContainerHighest : Colors.white);
-    final borderColor = isDark ? Colors.white10 : Colors.grey[200]!;
-    final textColor = colorScheme.onSurface;
-    final primaryColor = colorScheme.primary;
-
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: const Text(
-          'Statistics',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        centerTitle: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-            decoration: BoxDecoration(
-              color: isDark ? colorScheme.surfaceContainer : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: borderColor),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: DropdownButton<int>(
-              borderRadius: BorderRadius.circular(15),
-              value: date,
-              elevation: 4,
-              isDense: true,
-              underline: const SizedBox(),
-              dropdownColor: theme.cardTheme.color,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-              items: const [
-                DropdownMenuItem(value: 7, child: Text('7 days')),
-                DropdownMenuItem(value: 30, child: Text('30 days')),
-                DropdownMenuItem(value: 90, child: Text('90 days')),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    date = value;
-                  });
-                }
-              },
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: primaryColor,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: BlocBuilder<HabitService, HabitStates>(
-        builder: (context, state) {
-          if (state is! HabitLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: SafeArea(
+        child: BlocBuilder<HabitService, HabitStates>(
+          builder: (context, state) {
+            if (state is! HabitLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          final stats = HabitStatisticsService.derive(
-            habits: state.habits,
-            rangeDays: date,
-          );
+            final stats = HabitStatisticsService.derive(
+              habits: state.habits,
+              rangeDays: date,
+            );
 
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final isTablet = constraints.maxWidth > 600;
-              final horizontalPadding = isTablet ? 40.0 : 24.0;
-              
-              return SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      StatsOverallCard(snapshot: stats, dateRange: date),
-                      const SizedBox(height: 24),
-                      StatsActivityTrend(
-                        spots: stats.trendSpots,
-                        range: date,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                        textColor: textColor,
+                      const Text(
+                        'Statistics',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                      const SizedBox(height: 24),
-                      StatsHabitBreakdown(
-                        breakdowns: stats.breakdown,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                        textColor: textColor,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: DropdownButton<int>(
+                          value: date,
+                          underline: const SizedBox(),
+                          dropdownColor: const Color(0xFF0D1B1E),
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                          items: const [
+                            DropdownMenuItem(value: 7, child: Text('7d')),
+                            DropdownMenuItem(value: 30, child: Text('30d')),
+                            DropdownMenuItem(value: 90, child: Text('90d')),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) setState(() => date = value);
+                          },
+                          icon: const Icon(Icons.expand_more,
+                              color: Colors.white),
+                        ),
                       ),
-                      const SizedBox(height: 24),
-                      StatsStreakCard(
-                        streaks: stats.topStreaks,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                        textColor: textColor,
-                      ),
-                      const SizedBox(height: 24),
-                      StatsMomentumCard(
-                        streak: stats.topStreak,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                        textColor: textColor,
-                      ),
-                      const SizedBox(height: 24),
-                      StatsActivityMap(
-                        data: stats.heatmapData,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 120),
                     ],
                   ),
-                ),
-              );
-            },
-          );
-        },
+                  const SizedBox(height: 30),
+                  StatsOverallCard(snapshot: stats, dateRange: date),
+                  const SizedBox(height: 24),
+                  StatsActivityTrend(
+                    spots: stats.trendSpots,
+                    range: date,
+                    cardBg: Colors.white.withOpacity(0.05),
+                    borderColor: Colors.white.withOpacity(0.1),
+                    textColor: Colors.white,
+                  ),
+                  const SizedBox(height: 24),
+                  StatsHabitBreakdown(
+                    breakdowns: stats.breakdown,
+                    cardBg: Colors.white.withOpacity(0.05),
+                    borderColor: Colors.white.withOpacity(0.1),
+                    textColor: Colors.white,
+                  ),
+                  const SizedBox(height: 24),
+                  StatsStreakCard(
+                    streaks: stats.topStreaks,
+                    cardBg: Colors.white.withOpacity(0.05),
+                    borderColor: Colors.white.withOpacity(0.1),
+                    textColor: Colors.white,
+                  ),
+                  const SizedBox(height: 24),
+                  StatsMomentumCard(
+                    streak: stats.topStreak,
+                    cardBg: Colors.white.withOpacity(0.05),
+                    borderColor: Colors.white.withOpacity(0.1),
+                    textColor: Colors.white,
+                  ),
+                  const SizedBox(height: 120),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

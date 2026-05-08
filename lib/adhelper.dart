@@ -44,6 +44,8 @@ class Adhelper {
   }
 
   static bool areAdsDisabled() {
+    return true; // Force disable for now as requested
+    /*
     final box = Hive.box(_adPreferencesBox);
     final disabledUntilMs =
         box.get(_adsDisabledUntilKey, defaultValue: 0) as int;
@@ -51,6 +53,7 @@ class Adhelper {
 
     final disabledUntil = DateTime.fromMillisecondsSinceEpoch(disabledUntilMs);
     return DateTime.now().isBefore(disabledUntil);
+    */
   }
 
   static Future<void> initPreferences() async {

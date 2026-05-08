@@ -57,73 +57,83 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'HabitFlow.',
+            style: TextStyle(
+              fontSize: 24, // Updated to match Swift spec
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: -0.5,
+            ),
+          ),
+          Row(
             children: [
-              Text(
-                'HabitFlow.',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      // Notification action
-                    },
-                    icon: Icon(
-                      Icons.notifications_outlined,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+              Container(
+                width: 40, // Updated to match Swift spec
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.11), // 0.11 from Swift spec
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.2),
-                      border: Border.all(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.4),
-                        width: 1.5,
-                      ),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 24,
                     ),
-                    child: Center(
-                      child: Text(
-                        'JB',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFFD700), // Gold/Yellow from screenshot
+                          shape: BoxShape.circle,
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 40, // Updated to match Swift spec
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.11),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
                   ),
-                ],
+                ),
+                child: const Center(
+                  child: Text(
+                    'JB',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-        if (_bannerAd != null && !Adhelper.areAdsDisabled())
-          Container(
-            alignment: Alignment.center,
-            width: _bannerAd!.size.width.toDouble(),
-            height: _bannerAd!.size.height.toDouble(),
-            child: AdWidget(ad: _bannerAd!),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
