@@ -48,7 +48,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 );
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -73,11 +74,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         ],
                       ),
                       const SizedBox(height: 30),
-                      
+
                       // Overall Score Header
                       _buildSectionHeader('Overall Score'),
                       const SizedBox(height: 12),
-                      
+
                       // Hero Summary Card
                       _buildHeroCard(),
                       const SizedBox(height: 30),
@@ -86,7 +87,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       _buildSectionHeader('Performance'),
                       const SizedBox(height: 12),
                       _buildPerformanceChart(),
-                      
+
                       const SizedBox(height: 30),
 
                       // Streak Momentum Section
@@ -108,26 +109,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       _buildStreakMomentumCard(),
 
                       const SizedBox(height: 30),
-                      
+
                       // Goals & Progress Card
                       _buildSectionHeader('Goals & Progress'),
                       const SizedBox(height: 12),
                       _buildGoalsAndProgress(),
-                      
+
                       const SizedBox(height: 30),
-                      
+
                       // Monthly Growth Chart Card
                       _buildSectionHeader('Monthly Growth'),
                       const SizedBox(height: 12),
                       _buildGrowthChart(),
-                      
+
                       const SizedBox(height: 30),
-                      
+
                       // Heatmap Card (Last)
                       _buildSectionHeader('Consistency'),
                       const SizedBox(height: 12),
                       _buildHeatmapCalendar(),
-                      
+
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -146,7 +147,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Colors.white.withOpacity(0.9),
+        color: Color(0xFF1F5A25), // More visible green
         fontFamily: 'Inter',
       ),
     );
@@ -165,13 +166,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
-          child: Icon(icon, color: Colors.white, size: 22),
+          child: Icon(icon, color: Color(0xFF1F5A25), size: 22),
         ),
       ),
     );
   }
 
-  Widget _buildGlassCard({required Widget child, double? height, EdgeInsets? padding}) {
+  Widget _buildGlassCard(
+      {required Widget child, double? height, EdgeInsets? padding}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(40),
       child: BackdropFilter(
@@ -218,7 +220,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   Text(
                     'Consistency score',
                     style: TextStyle(
-                      color: const Color(0xFF1F5A25).withOpacity(0.7),
+                      color: Color(0xFF1F5A25),
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
@@ -227,7 +229,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   const Text(
                     '+12% from last week',
                     style: TextStyle(
-                      color: Color(0xFF1F5A25),
+                      color: Color(0xFF7FD88B), // Green accent for visibility
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -244,7 +246,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       value: 0.87,
                       strokeWidth: 14,
                       backgroundColor: Colors.white.withOpacity(0.1),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF7FD88B)),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                          Color(0xFF7FD88B)),
                       strokeCap: StrokeCap.round,
                     ),
                   ),
@@ -279,9 +282,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       width: 90,
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white),
       ),
       child: Center(
         child: Text(
@@ -388,7 +391,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       width: 42,
       height: 70,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(21),
       ),
       child: Column(
@@ -397,7 +400,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           Text(
             day,
             style: TextStyle(
-              color: const Color(0xFF1F5A25).withOpacity(0.5),
+              color: isDone ? Color(0xFF1F5A25) : Colors.black,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -407,7 +410,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             width: 14,
             height: 14,
             decoration: BoxDecoration(
-              color: isDone ? const Color(0xFF1F5A25) : Colors.black12,
+              color: isDone ? Color(0xFF7FD88B) : Colors.black12,
               shape: BoxShape.circle,
             ),
           ),
@@ -433,13 +436,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     const Text(
                       'Daily Activity',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF1F5A25),
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.figmaGreenLight.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -493,9 +497,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
           const SizedBox(height: 30),
           // Goals list
-          _buildGoalItem('Hydration Goal', 0.85, '1.2L left', AppColors.figmaCyan),
-          _buildGoalItem('Reading Session', 0.60, '15m left', AppColors.figmaYellow),
-          _buildGoalItem('Daily Steps', 0.95, '200 left', AppColors.figmaGreenLight),
+          _buildGoalItem(
+              'Hydration Goal', 0.85, '1.2L left', AppColors.figmaCyan),
+          _buildGoalItem(
+              'Reading Session', 0.60, '15m left', AppColors.figmaYellow),
+          _buildGoalItem(
+              'Daily Steps', 0.95, '200 left', AppColors.figmaGreenLight),
         ],
       ),
     );
@@ -520,10 +527,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
             Text(
               '${(progress * 100).toInt()}%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: color,
               ),
             ),
           ],
@@ -533,7 +540,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           label,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.7),
+            color: color,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -541,7 +548,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget _buildGoalItem(String title, double progress, String sub, Color color) {
+  Widget _buildGoalItem(
+      String title, double progress, String sub, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -551,17 +559,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: color,
                 ),
               ),
               Text(
                 sub,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withOpacity(0.5),
+                  color: color,
                 ),
               ),
             ],
@@ -605,7 +613,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   Widget _buildHeatmapCalendar() {
     final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    
+
     return _buildGlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,9 +631,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
               Row(
                 children: [
-                  Icon(Icons.chevron_left, color: Colors.white.withOpacity(0.5), size: 20),
+                  Icon(Icons.chevron_left,
+                      color: Colors.white.withOpacity(0.5), size: 20),
                   const SizedBox(width: 15),
-                  Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.5), size: 20),
+                  Icon(Icons.chevron_right,
+                      color: Colors.white.withOpacity(0.5), size: 20),
                 ],
               ),
             ],
@@ -634,18 +644,20 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           // Day labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: days.map((day) => Expanded(
-              child: Center(
-                child: Text(
-                  day,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.4),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            )).toList(),
+            children: days
+                .map((day) => Expanded(
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.4),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
           const SizedBox(height: 10),
           // Heatmap grid
@@ -659,19 +671,22 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
             itemCount: 35, // Show 5 weeks
             itemBuilder: (context, index) {
-              if (index < 3 || index > 33) { // Mock empty days at start/end
+              if (index < 3 || index > 33) {
+                // Mock empty days at start/end
                 return Container();
               }
               final intensity = (index * 13 % 10) / 10.0;
               return Container(
                 decoration: BoxDecoration(
-                  color: intensity < 0.2 
-                    ? Colors.white.withOpacity(0.05)
-                    : AppColors.figmaGreenLight.withOpacity(0.1 + intensity * 0.7),
+                  color: intensity < 0.2
+                      ? Colors.white.withOpacity(0.05)
+                      : AppColors.figmaGreenLight
+                          .withOpacity(0.1 + intensity * 0.7),
                   borderRadius: BorderRadius.circular(4),
-                  border: intensity > 0.8 
-                    ? Border.all(color: Colors.white.withOpacity(0.2), width: 1)
-                    : null,
+                  border: intensity > 0.8
+                      ? Border.all(
+                          color: Colors.white.withOpacity(0.2), width: 1)
+                      : null,
                 ),
               );
             },
@@ -680,19 +695,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('Less', style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.4))),
+              Text('Less',
+                  style: TextStyle(
+                      fontSize: 10, color: Colors.white.withOpacity(0.4))),
               const SizedBox(width: 6),
-              ...List.generate(5, (i) => Container(
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: AppColors.figmaGreenLight.withOpacity(0.1 + (i * 0.2)),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              )),
+              ...List.generate(
+                  5,
+                  (i) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: AppColors.figmaGreenLight
+                              .withOpacity(0.1 + (i * 0.2)),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      )),
               const SizedBox(width: 6),
-              Text('More', style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.4))),
+              Text('More',
+                  style: TextStyle(
+                      fontSize: 10, color: Colors.white.withOpacity(0.4))),
             ],
           ),
         ],
@@ -829,9 +851,12 @@ class _ChartPainter extends CustomPainter {
         var prev = points[i - 1];
         var curr = points[i];
         path.cubicTo(
-          prev.dx + xStep / 2, prev.dy,
-          curr.dx - xStep / 2, curr.dy,
-          curr.dx, curr.dy,
+          prev.dx + xStep / 2,
+          prev.dy,
+          curr.dx - xStep / 2,
+          curr.dy,
+          curr.dx,
+          curr.dy,
         );
       }
     }
@@ -846,9 +871,12 @@ class _ChartPainter extends CustomPainter {
       var prev = points[i - 1];
       var curr = points[i];
       linePath.cubicTo(
-        prev.dx + xStep / 2, prev.dy,
-        curr.dx - xStep / 2, curr.dy,
-        curr.dx, curr.dy,
+        prev.dx + xStep / 2,
+        prev.dy,
+        curr.dx - xStep / 2,
+        curr.dy,
+        curr.dx,
+        curr.dy,
       );
     }
     canvas.drawPath(linePath, linePaint);
@@ -856,7 +884,13 @@ class _ChartPainter extends CustomPainter {
     // Draw dots
     for (final point in points) {
       canvas.drawCircle(point, 4, dotPaint);
-      canvas.drawCircle(point, 6, Paint()..color = AppColors.figmaGreenLight.withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawCircle(
+          point,
+          6,
+          Paint()
+            ..color = AppColors.figmaGreenLight.withOpacity(0.3)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2);
     }
   }
 
