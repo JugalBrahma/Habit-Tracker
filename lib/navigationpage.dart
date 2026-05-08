@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/homepage.dart';
 import 'package:habit_tracker/screens/statistics_screen.dart';
-import 'package:habit_tracker/screens/config/colors/app_colors.dart';
+import 'package:habit_tracker/screens/gallery_screen.dart';
 
 class Navigationpage extends StatefulWidget {
   const Navigationpage({super.key});
@@ -19,17 +19,27 @@ class _NavigationpageState extends State<Navigationpage> {
       extendBody: true,
       body: Stack(
         children: [
-          // Background Gradient
+          // Background image
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/backgrounds/image 1.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          // Dark overlay
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF0D1B1E), // Very dark teal
-                    Color(0xFF132A25), // Forest dark
-                    Color(0xFF0F201C), // Deepest green
+                    Colors.black.withOpacity(0.3),
+                    Colors.black.withOpacity(0.6),
                   ],
                 ),
               ),
@@ -40,32 +50,35 @@ class _NavigationpageState extends State<Navigationpage> {
             index: _selectedindex,
             children: const [
               Homepage(), 
-              StatisticsScreen(), 
+              StatisticsScreen(),
+              GalleryScreen(),
             ],
           ),
-          // Bottom Navigation Bar
-          Align(
-            alignment: Alignment.bottomCenter,
+          // Bottom Navigation Bar (exact from Figma)
+          Positioned(
+            left: 11,
+            right: 11,
+            bottom: 30,
             child: Container(
-              height: 80,
-              margin: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
+              height: 84,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(40),
+                color: const Color(0x1F1F5A25),
+                borderRadius: BorderRadius.circular(39),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.12),
                   width: 1.5,
                 ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
+                borderRadius: BorderRadius.circular(39),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildNavItem(0, Icons.grid_view_rounded),
-                      _buildNavItem(1, Icons.bar_chart_rounded),
+                      _buildNavItem(0, '🏠', 'Home'),
+                      _buildNavItem(1, '📊', 'Stats'),
+                      _buildNavItem(2, '🖼️', 'Gallery'),
                     ],
                   ),
                 ),
@@ -77,22 +90,32 @@ class _NavigationpageState extends State<Navigationpage> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon) {
+  Widget _buildNavItem(int index, String emoji, String label) {
     final isSelected = _selectedindex == index;
     return GestureDetector(
       onTap: () => setState(() => _selectedindex = index),
       child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.premiumGreenIndicator : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          color: isSelected ? Colors.black : Colors.white.withOpacity(0.4),
-          size: 28,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 22),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF7FD88B) : const Color(0xFFA8D5A0),
+                fontSize: 9,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
