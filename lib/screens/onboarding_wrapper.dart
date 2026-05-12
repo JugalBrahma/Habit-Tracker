@@ -18,16 +18,10 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> {
   }
 
   Future<void> _checkOnboardingStatus() async {
+    // Always show onboarding on app restart
+    // Remove this check or set has_completed_onboarding to false on app start
     final prefs = await SharedPreferences.getInstance();
-    final hasCompletedOnboarding = prefs.getBool('has_completed_onboarding') ?? false;
-    
-    if (hasCompletedOnboarding) {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Navigationpage()),
-        );
-      }
-    }
+    await prefs.setBool('has_completed_onboarding', false);
   }
 
   void _completeOnboarding() async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ForestOnboardingFlow extends StatefulWidget {
   final VoidCallback? onComplete;
@@ -19,9 +20,17 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
   static const _accentDark = Color(0xFF3E7B27);
 
   void _next() {
-    if (_index < 3) {
+    if (_index < 2) {
       _controller.nextPage(duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
     }
+  }
+
+  void _goToPage(int page) {
+    _controller.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOut,
+    );
   }
 
   Widget _header() {
@@ -29,29 +38,48 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Icon(Icons.arrow_back, color: _accent, size: 20),
-          Text("Skip", style: TextStyle(color: _accent, fontSize: 12, fontWeight: FontWeight.w600)),
+        children: [
+          GestureDetector(
+            onTap: () {
+              if (_index > 0) {
+                _controller.previousPage(
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeOut,
+                );
+              }
+            },
+            child: const Icon(Icons.arrow_back, color: _accent, size: 20),
+          ),
+          GestureDetector(
+            onTap: () {
+              if (widget.onComplete != null) {
+                widget.onComplete!();
+              }
+            },
+            child: const Text("Skip", style: TextStyle(color: _accent, fontSize: 12, fontWeight: FontWeight.w600)),
+          ),
         ],
       ),
     );
   }
 
-  Widget _dots(int active) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (i) {
-        final on = i == active;
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: on ? 24 : 8,
-          height: on ? 6 : 8,
-          decoration: BoxDecoration(
-            color: on ? _accent : const Color(0xFF353534),
-            borderRadius: BorderRadius.circular(999),
-          ),
-        );
-      }),
+  Widget _dots() {
+    return SmoothPageIndicator(
+      controller: _controller,
+      count: 3,
+      effect: JumpingDotEffect(
+        spacing: 12,
+        radius: 4,
+        dotWidth: 8,
+        dotHeight: 8,
+        paintStyle: PaintingStyle.fill,
+        strokeWidth: 1,
+        dotColor: const Color(0xFF353534),
+        activeDotColor: _accent,
+        jumpScale: 1.0,
+        verticalOffset: 0,
+      ),
+      onDotClicked: _goToPage,
     );
   }
 
@@ -72,63 +100,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
     );
   }
 
-  Widget _screen1() {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Image.network(
-            "https://www.figma.com/api/mcp/asset/8a6022c2-4541-4459-8ec6-6ada7d9073d7",
-            fit: BoxFit.cover,
-            color: Colors.black.withOpacity(.45),
-            colorBlendMode: BlendMode.darken,
-          ),
-        ),
-        Positioned.fill(
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xB3131313), Color(0xFF131313)],
-              ),
-            ),
-          ),
-        ),
-        Column(
-          children: [
-            _header(),
-            const Spacer(),
-            CircleAvatar(
-              radius: 58,
-              backgroundColor: const Color(0xFF1E1E1E),
-              child: Image.network("https://www.figma.com/api/mcp/asset/2e9beb42-5655-4307-b1de-d376841b8f5b"),
-            ),
-            const SizedBox(height: 20),
-            const Text("Forest Habit",
-                style: TextStyle(color: _accent, fontSize: 46, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            const Text("Growth in the Shadows",
-                style: TextStyle(color: _text, fontSize: 16, fontWeight: FontWeight.w600)),
-            const Spacer(),
-            Container(
-              width: 128,
-              height: 4,
-              decoration: BoxDecoration(color: const Color(0xFF353534), borderRadius: BorderRadius.circular(99)),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(width: 42, decoration: BoxDecoration(color: _accent, borderRadius: BorderRadius.circular(99))),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text("CULTIVATE EXCELLENCE",
-                style: TextStyle(color: Color(0xFF8B9383), fontSize: 12, letterSpacing: 2.4, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ],
-    );
-  }
-
+  
   Widget _screen2() {
     return Column(
       children: [
@@ -162,11 +134,11 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
                 SizedBox(
                   height: 160,
                   width: double.infinity,
-                  child: Image.network("https://www.figma.com/api/mcp/asset/61e6e138-d826-40f0-b69a-ef319d5a3779", fit: BoxFit.cover),
+                  child: Image.asset("assets/onboarding_images/Abstract Growth Chart.png", fit: BoxFit.cover),
                 ),
                 const SizedBox(height: 12),
                 Row(
-                  children: const [
+                  children: [
                     Expanded(child: _StatTile("Current Streak", "18 Days")),
                     SizedBox(width: 8),
                     Expanded(child: _StatTile("Focus Time", "42.5h")),
@@ -188,7 +160,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
           ),
         ),
         const Spacer(),
-        _dots(1),
+        _dots(),
         const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -231,7 +203,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
           ),
         ),
         const Spacer(),
-        _dots(0),
+        _dots(),
         const SizedBox(height: 24),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -310,9 +282,47 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
               }),
             ),
             const SizedBox(height: 14),
-            const Text("Sign In", style: TextStyle(color: _muted, fontSize: 16)),
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black87,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      // TODO: Navigate to signup
+                      print('Navigate to signup');
+                    },
+                    child: const Text("Sign up", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white, width: 1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      // TODO: Navigate to login
+                      print('Navigate to login');
+                    },
+                    child: const Text("Log in", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
-            _dots(2),
+            _dots(),
             const SizedBox(height: 24),
           ],
         ),
@@ -328,7 +338,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
         child: PageView(
           controller: _controller,
           onPageChanged: (i) => setState(() => _index = i),
-          children: [_screen1(), _screen2(), _screen3(), _screen4()],
+          children: [_screen2(), _screen3(), _screen4()],
         ),
       ),
     );

@@ -49,6 +49,7 @@ dependencies:
   google_mobile_ads: ^7.0.0
   flutter_local_notifications: ^21.0.0
   shared_preferences: ^2.5.5
+  smooth_page_indicator: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,7 @@ flutter:
   assets:
     - assets/app_logo/app_logo.png
     - assets/backgrounds/
+    - assets/onboarding_images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
