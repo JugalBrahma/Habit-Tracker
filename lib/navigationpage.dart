@@ -1,8 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/homepage.dart';
 import 'package:habit_tracker/screens/statistics_screen.dart';
-import 'package:habit_tracker/screens/gallery_screen.dart';
+import 'package:habit_tracker/screens/habit_library_screen.dart';
+import 'package:habit_tracker/screens/profile_screen.dart';
 
 class Navigationpage extends StatefulWidget {
   const Navigationpage({super.key});
@@ -49,71 +49,61 @@ class _NavigationpageState extends State<Navigationpage> {
           IndexedStack(
             index: _selectedindex,
             children: const [
-              Homepage(), 
-              StatisticsScreen(),
-              GalleryScreen(),
+              TodayHabitsScreen(),
+              HabitLibraryScreen(),
+              ProgressOverviewScreen(),
+              ProfileScreenNature(),
             ],
-          ),
-          // Bottom Navigation Bar (exact from Figma)
-          Positioned(
-            left: 11,
-            right: 11,
-            bottom: 30,
-            child: Container(
-              height: 84,
-              decoration: BoxDecoration(
-                color: const Color(0x1F1F5A25),
-                borderRadius: BorderRadius.circular(39),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.12),
-                  width: 1.5,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(39),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildNavItem(0, '🏠', 'Home'),
-                      _buildNavItem(1, '📊', 'Stats'),
-                      _buildNavItem(2, '🖼️', 'Gallery'),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
+      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
-  Widget _buildNavItem(int index, String emoji, String label) {
-    final isSelected = _selectedindex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedindex = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  Widget _buildBottomNav() {
+    Widget navItem(IconData icon, String label, bool active) {
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedindex = [Icons.today_outlined, Icons.tune, Icons.show_chart, Icons.person].indexOf(icon);
+          });
+        },
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              emoji,
-              style: const TextStyle(fontSize: 22),
-            ),
+            Icon(icon, size: 18, color: active ? const Color(0xFF95D878) : const Color(0xFFC1C9B8)),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? const Color(0xFF7FD88B) : const Color(0xFFA8D5A0),
-                fontSize: 9,
-                fontFamily: 'Inter',
+                color: active ? const Color(0xFF95D878) : const Color(0xFFC1C9B8),
+                fontSize: 12,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w600,
               ),
             ),
           ],
         ),
+      );
+    }
+
+    return Container(
+      height: 82,
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF201F1F),
+        border: const Border(top: BorderSide(color: Color.fromRGBO(65, 73, 60, 0.2))),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        boxShadow: [BoxShadow(color: const Color(0xFF3E7B27).withOpacity(.2), blurRadius: 14)],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          navItem(Icons.today_outlined, 'Today', _selectedindex == 0),
+          navItem(Icons.tune, 'Habits', _selectedindex == 1),
+          navItem(Icons.show_chart, 'Progress', _selectedindex == 2),
+          navItem(Icons.person, 'Profile', _selectedindex == 3),
+        ],
       ),
     );
   }
