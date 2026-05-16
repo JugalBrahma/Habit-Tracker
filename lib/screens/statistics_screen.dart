@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:habit_tracker/service/bloc/habit_state.dart';
+import 'package:habit_tracker/service/repositery/habit_service.dart';
+import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:intl/intl.dart';
 
 class ProgressOverviewScreen extends StatelessWidget {
   const ProgressOverviewScreen({super.key});
@@ -16,41 +21,56 @@ class ProgressOverviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Column(
-          children: [
-            const _TopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Progress Overview',
-                      style: TextStyle(
-                        color: textPrimary,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w700,
+        child: BlocBuilder<HabitService, HabitStates>(
+          builder: (context, state) {
+            if (state is HabitLoading) {
+              return const Center(child: CircularProgressIndicator(color: accent));
+            }
+            if (state is HabitLoaded) {
+              final snapshot = HabitStatisticsService.derive(
+                habits: state.habits,
+                rangeDays: 7,
+              );
+
+              return Column(
+                children: [
+                  const _TopBar(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Progress Overview',
+                            style: TextStyle(
+                              color: textPrimary,
+                              fontSize: 40,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Track your growth in the shadows.',
+                            style: TextStyle(color: textMuted, fontSize: 14),
+                          ),
+                          const SizedBox(height: 16),
+                          _ConsistencyCard(score: snapshot.completionRate),
+                          const SizedBox(height: 12),
+                          _StreakCard(currentStreak: snapshot.topStreak?.current ?? 0),
+                          const SizedBox(height: 12),
+                          _TrendCard(spots: snapshot.trendSpots),
+                          const SizedBox(height: 12),
+                          _VolumeCard(spots: snapshot.trendSpots),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Track your growth in the shadows.',
-                      style: TextStyle(color: textMuted, fontSize: 14),
-                    ),
-                    SizedBox(height: 16),
-                    _ConsistencyCard(),
-                    SizedBox(height: 12),
-                    _StreakCard(),
-                    SizedBox(height: 12),
-                    _TrendCard(),
-                    SizedBox(height: 12),
-                    _VolumeCard(),
-                  ],
-                ),
-              ),
-            ),
-          ],
+                  ),
+                ],
+              );
+            }
+            return const Center(child: Text("Error loading statistics", style: TextStyle(color: Colors.white)));
+          },
         ),
       ),
     );
@@ -132,10 +152,15 @@ class _ShellCard extends StatelessWidget {
 }
 
 class _ConsistencyCard extends StatelessWidget {
-  const _ConsistencyCard();
+  final int score;
+  const _ConsistencyCard({required this.score});
 
   @override
   Widget build(BuildContext context) {
+    String label = "NEEDS WORK";
+    if (score >= 80) label = "EXCELLENT";
+    else if (score >= 50) label = "GOOD";
+
     return _ShellCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +181,7 @@ class _ConsistencyCard extends StatelessWidget {
                   height: 192,
                   child: CircularProgressIndicator(
                     strokeWidth: 8,
-                    value: .87,
+                    value: score / 100.0,
                     backgroundColor: const Color(0xFF2A2A2A),
                     valueColor: const AlwaysStoppedAnimation(ProgressOverviewScreen.accent),
                   ),
@@ -168,14 +193,14 @@ class _ConsistencyCard extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '87',
-                            style: TextStyle(
+                            text: '$score',
+                            style: const TextStyle(
                               color: ProgressOverviewScreen.textPrimary,
                               fontSize: 64,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          TextSpan(
+                          const TextSpan(
                             text: '%',
                             style: TextStyle(
                               color: ProgressOverviewScreen.accent,
@@ -186,9 +211,9 @@ class _ConsistencyCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text('EXCELLENT',
-                        style: TextStyle(
+                    const SizedBox(height: 8),
+                    Text(label,
+                        style: const TextStyle(
                           color: ProgressOverviewScreen.accent,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -206,7 +231,8 @@ class _ConsistencyCard extends StatelessWidget {
 }
 
 class _StreakCard extends StatelessWidget {
-  const _StreakCard();
+  final int currentStreak;
+  const _StreakCard({required this.currentStreak});
 
   @override
   Widget build(BuildContext context) {
@@ -235,9 +261,9 @@ class _StreakCard extends StatelessWidget {
                 border: Border.all(color: const Color.fromRGBO(149, 216, 120, .2)),
                 boxShadow: [BoxShadow(color: ProgressOverviewScreen.accentDark.withOpacity(.45), blurRadius: 25)],
               ),
-              child: const Center(
-                child: Text('14',
-                    style: TextStyle(color: ProgressOverviewScreen.textPrimary, fontSize: 80, fontWeight: FontWeight.w700)),
+              child: Center(
+                child: Text('$currentStreak',
+                    style: const TextStyle(color: ProgressOverviewScreen.textPrimary, fontSize: 60, fontWeight: FontWeight.w700)),
               ),
             ),
           ),
@@ -258,12 +284,15 @@ class _StreakCard extends StatelessWidget {
 }
 
 class _TrendCard extends StatelessWidget {
-  const _TrendCard();
+  final List<dynamic> spots; // List<FlSpot> but dynamic to avoid strict import issues if fl_chart not available here
+  const _TrendCard({required this.spots});
 
   @override
   Widget build(BuildContext context) {
-    final points = [0.15, 0.30, 0.25, 0.48, 0.67, 0.78];
-    final labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    final labels = List.generate(7, (index) {
+      final date = DateTime.now().subtract(Duration(days: 6 - index));
+      return DateFormat.E().format(date);
+    });
 
     return _ShellCard(
       child: Column(
@@ -300,9 +329,9 @@ class _TrendCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        children: points
-                            .map((p) => Padding(
-                                  padding: EdgeInsets.only(bottom: p * 110),
+                        children: spots
+                            .map((s) => Padding(
+                                  padding: EdgeInsets.only(bottom: (s.y / 100.0) * 110),
                                   child: Container(
                                     width: 6,
                                     height: 6,
@@ -348,12 +377,19 @@ class _TrendCard extends StatelessWidget {
 }
 
 class _VolumeCard extends StatelessWidget {
-  const _VolumeCard();
+  final List<dynamic> spots;
+  const _VolumeCard({required this.spots});
 
   @override
   Widget build(BuildContext context) {
-    final bars = [48.0, 96.0, 80.0, 128.0, 64.0, 112.0, 144.0];
     final labels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    // Map spots to 7 days
+    final List<double> values = spots.map((s) => (s.y as double).clamp(0, 100).toDouble()).toList();
+    if (values.length < 7) {
+      while (values.length < 7) {
+        values.insert(0, 0.0);
+      }
+    }
 
     return _ShellCard(
       child: Column(
@@ -378,9 +414,10 @@ class _VolumeCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(bars.length, (i) {
-                final isToday = i == bars.length - 1;
-                final mid = bars[i] >= 80 && !isToday;
+              children: List.generate(values.length, (i) {
+                final isToday = i == values.length - 1;
+                final height = (values[i] / 100.0) * 140 + 4; // minimum 4 height
+                final mid = values[i] >= 80 && !isToday;
                 final color = isToday
                     ? ProgressOverviewScreen.accent
                     : (mid ? ProgressOverviewScreen.accentDark : const Color(0xFF1E331A));
@@ -389,7 +426,7 @@ class _VolumeCard extends StatelessWidget {
                   children: [
                     Container(
                       width: 32,
-                      height: bars[i],
+                      height: height,
                       decoration: BoxDecoration(
                         color: color,
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
@@ -404,7 +441,7 @@ class _VolumeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      labels[i],
+                      labels[i % 7], // Approximation
                       style: TextStyle(
                         color: isToday ? ProgressOverviewScreen.accent : ProgressOverviewScreen.textMuted,
                         fontSize: 12,
@@ -421,3 +458,4 @@ class _VolumeCard extends StatelessWidget {
     );
   }
 }
+

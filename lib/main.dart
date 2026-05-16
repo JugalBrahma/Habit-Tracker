@@ -85,7 +85,10 @@ void main() async {
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => ThemeCubit())],
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => HabitService(repo)..add(LoadHabit())),
+      ],
       child: MyApp(repo: repo),
     ),
   );
@@ -109,12 +112,10 @@ class _MyAppState extends State<MyApp> {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
-          home: BlocProvider(
-            create: (context) => HabitService(widget.repo)..add(LoadHabit()),
-            child: OnboardingWrapper(),
-          ),
+          home: const OnboardingWrapper(),
         );
       },
     );
   }
 }
+
