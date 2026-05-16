@@ -14,30 +14,26 @@ class RoutineFormFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final colorScheme = theme.colorScheme;
     final primaryColor = Color(selectedColor);
-    final cardColor = isDark
-        ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-        : Colors.white;
-    final borderColor = isDark ? Colors.white10 : Colors.grey[200]!;
-    final textColor = colorScheme.onSurface;
-    final secondaryTextColor = colorScheme.onSurface.withOpacity(0.6);
+    const Color textColor = Colors.white;
+    final Color secondaryTextColor = Colors.white.withOpacity(0.6);
+    final Color inputBgColor = Colors.white.withOpacity(0.05);
+    final Color borderColor = Colors.white.withOpacity(0.1);
 
     return Column(
       children: [
         TextFormField(
           controller: habitname,
-          style: TextStyle(color: textColor),
+          style: const TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             labelText: 'Routine Name',
-            labelStyle: TextStyle(color: secondaryTextColor),
+            labelStyle: TextStyle(color: secondaryTextColor, fontSize: 14),
             hintText: 'e.g., Morning Yoga',
-            hintStyle: TextStyle(color: textColor.withOpacity(0.3)),
-            prefixIcon: Icon(Icons.edit_note, color: primaryColor),
+            hintStyle: TextStyle(color: textColor.withOpacity(0.2)),
+            prefixIcon: Icon(Icons.edit_note, color: primaryColor, size: 22),
             filled: true,
-            fillColor: cardColor,
+            fillColor: inputBgColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: borderColor),
@@ -48,23 +44,24 @@ class RoutineFormFields extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: primaryColor, width: 2),
+              borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 2),
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         TextFormField(
           maxLines: 3,
           controller: description,
-          style: TextStyle(color: textColor),
+          style: const TextStyle(color: textColor, fontSize: 15),
           decoration: InputDecoration(
             labelText: 'Description (optional)',
-            labelStyle: TextStyle(color: secondaryTextColor),
+            labelStyle: TextStyle(color: secondaryTextColor, fontSize: 14),
             hintText: 'Small steps every day...',
-            hintStyle: TextStyle(color: textColor.withOpacity(0.3)),
-            prefixIcon: Icon(Icons.description_outlined, color: primaryColor),
+            hintStyle: TextStyle(color: textColor.withOpacity(0.2)),
+            prefixIcon: Icon(Icons.description_outlined, color: primaryColor, size: 22),
             filled: true,
-            fillColor: cardColor,
+            fillColor: inputBgColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: borderColor),
@@ -75,7 +72,7 @@ class RoutineFormFields extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: primaryColor, width: 2),
+              borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 2),
             ),
           ),
         ),

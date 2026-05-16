@@ -6,6 +6,7 @@ import 'package:habit_tracker/screens/widgets/common/premium_snackbar.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/color_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/icon_picker.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/repeat_days_selector.dart';
+import 'package:habit_tracker/screens/widgets/glass_container.dart';
 
 import 'package:habit_tracker/screens/widgets/create_routine/goal_duration_selector.dart';
 import 'package:habit_tracker/screens/widgets/create_routine/time_goal_selector.dart';
@@ -23,16 +24,8 @@ class _CreateRoutineState extends State<CreateRoutine> {
   final TextEditingController habitname = TextEditingController();
   final TextEditingController description = TextEditingController();
 
-  final List<Map<String, dynamic>> _colors = [
-    {'color': 0xFF6366F1, 'name': 'Indigo'},
-    {'color': 0xFF8B5CF6, 'name': 'Purple'},
-    {'color': 0xFFEC4899, 'name': 'Pink'},
-    {'color': 0xFFEF4444, 'name': 'Red'},
-    {'color': 0xFFF97316, 'name': 'Orange'},
-    {'color': 0xFFEAB308, 'name': 'Yellow'},
-    {'color': 0xFF22C55E, 'name': 'Green'},
-    {'color': 0xFF06B6D4, 'name': 'Cyan'},
-  ];
+  static const Color appGreen = Color(0xFF95D878);
+
   final List<Map<String, dynamic>> _icons = [
     {'icon': Icons.fitness_center, 'name': 'Fitness'},
     {'icon': Icons.directions_run, 'name': 'Run'},
@@ -66,7 +59,7 @@ class _CreateRoutineState extends State<CreateRoutine> {
     'Sun',
   ];
 
-  int _selectedColor = 0xFF6366F1;
+  int _selectedColor = 0xFF95D878;
   String _selectedIconName = 'Run';
   final Set<String> _selectedRepeatDays = {
     'Mon',
@@ -90,99 +83,123 @@ class _CreateRoutineState extends State<CreateRoutine> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-    final primaryColor = Color(_selectedColor);
-    final textColor = colorScheme.onSurface;
-    final secondaryTextColor = colorScheme.onSurface.withOpacity(0.6);
-    final scaffoldBg = isDark ? colorScheme.surface : Colors.grey[50];
+    const Color bg = Color(0xFF131313);
+    const Color cardBg = Color(0xFF1E1E1E);
+    const Color cardBorder = Color(0xFF2A3326);
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      backgroundColor: bg,
       appBar: AppBar(
         title: const Text(
-          "Create Routine",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "New Habit",
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 24,
+            letterSpacing: -0.5,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: bg.withOpacity(0.8),
         elevation: 0,
-        foregroundColor: textColor,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionHeader("General Info", primaryColor),
-              const SizedBox(height: 12),
-              RoutineFormFields(
-                habitname: habitname,
-                description: description,
-                selectedColor: _selectedColor,
+              const SizedBox(height: 10),
+              _buildSectionCard(
+                title: "GENERAL INFO",
+                bg: cardBg,
+                border: cardBorder,
+                child: RoutineFormFields(
+                  habitname: habitname,
+                  description: description,
+                  selectedColor: _selectedColor,
+                ),
               ),
-              const SizedBox(height: 32),
-              _sectionHeader("Appearance", primaryColor),
-              const SizedBox(height: 16),
-              _subHeader('Color Theme', secondaryTextColor),
-              const SizedBox(height: 12),
-              ColorPicker(
-                colors: _colors,
-                selectedColor: _selectedColor,
-                onColorSelected: (color) =>
-                    setState(() => _selectedColor = color),
+              const SizedBox(height: 20),
+              _buildSectionCard(
+                title: "APPEARANCE",
+                bg: cardBg,
+                border: cardBorder,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Icon",
+                      style: TextStyle(color: Color(0xFFC1C9B8), fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    IconPicker(
+                      icons: _icons,
+                      selectedIconName: _selectedIconName,
+                      selectedColor: _selectedColor,
+                      onIconSelected: (name) => setState(() => _selectedIconName = name),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 24),
-              _subHeader("Icon", secondaryTextColor),
-              const SizedBox(height: 12),
-              IconPicker(
-                icons: _icons,
-                selectedIconName: _selectedIconName,
-                selectedColor: _selectedColor,
-                onIconSelected: (name) =>
-                    setState(() => _selectedIconName = name),
+              const SizedBox(height: 20),
+              _buildSectionCard(
+                title: "SCHEDULE",
+                bg: cardBg,
+                border: cardBorder,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Repeat Days",
+                      style: TextStyle(color: Color(0xFFC1C9B8), fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    RepeatDaysSelector(
+                      weekdays: _weekdays,
+                      selectedRepeatDays: _selectedRepeatDays,
+                      selectedColor: _selectedColor,
+                      onDayToggled: (day) {
+                        setState(() {
+                          if (_selectedRepeatDays.contains(day)) {
+                            _selectedRepeatDays.remove(day);
+                          } else {
+                            _selectedRepeatDays.add(day);
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Goal Duration",
+                      style: TextStyle(color: Color(0xFFC1C9B8), fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    GoalDurationSelector(
+                      targetDays: _targetDays,
+                      selectedColor: _selectedColor,
+                      onGoalChanged: (val) => setState(() => _targetDays = val),
+                    ),
+                    const SizedBox(height: 24),
+                    TimeGoalSelector(
+                      targetMinutes: _targetMinutes,
+                      selectedColor: _selectedColor,
+                      onTimeGoalChanged: (val) => setState(() => _targetMinutes = val),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 32),
-              _sectionHeader("Schedule", primaryColor),
-              const SizedBox(height: 16),
-              _subHeader('Repeat Days', secondaryTextColor),
-              const SizedBox(height: 12),
-              RepeatDaysSelector(
-                weekdays: _weekdays,
-                selectedRepeatDays: _selectedRepeatDays,
-                selectedColor: _selectedColor,
-                onDayToggled: (day) {
-                  setState(() {
-                    if (_selectedRepeatDays.contains(day)) {
-                      _selectedRepeatDays.remove(day);
-                    } else {
-                      _selectedRepeatDays.add(day);
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              _subHeader('Goal Duration', secondaryTextColor),
-              const SizedBox(height: 12),
-              GoalDurationSelector(
-                targetDays: _targetDays,
-                selectedColor: _selectedColor,
-                onGoalChanged: (val) => setState(() => _targetDays = val),
-              ),
-              const SizedBox(height: 24),
-              TimeGoalSelector(
-                targetMinutes: _targetMinutes,
-                selectedColor: _selectedColor,
-                onTimeGoalChanged: (val) => setState(() => _targetMinutes = val),
-              ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 40),
               CreateHabitButton(
                 selectedColor: _selectedColor,
                 onTap: _submitHabit,
+                text: "Create Habit",
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -190,22 +207,37 @@ class _CreateRoutineState extends State<CreateRoutine> {
     );
   }
 
-  Widget _sectionHeader(String title, Color primaryColor) {
-    return Text(
-      title.toUpperCase(),
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w800,
-        color: primaryColor.withOpacity(0.8),
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-
-  Widget _subHeader(String title, Color color) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.w600),
+  Widget _buildSectionCard({
+    required String title,
+    required Widget child,
+    required Color bg,
+    required Color border,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF95D878),
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: border, width: 1.5),
+          ),
+          child: child,
+        ),
+      ],
     );
   }
 

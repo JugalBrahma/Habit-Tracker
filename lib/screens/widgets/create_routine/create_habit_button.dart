@@ -14,21 +14,26 @@ class CreateHabitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Color(selectedColor);
+    const Color appGreen = Color(0xFF95D878);
+    const Color appGreenDark = Color(0xFF3E7B27);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 60,
+        height: 62,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: primaryColor,
+          gradient: const LinearGradient(
+            colors: [appGreen, appGreenDark],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: appGreen.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -36,7 +41,7 @@ class CreateHabitButton extends StatelessWidget {
           child: Text(
             text,
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 18,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,

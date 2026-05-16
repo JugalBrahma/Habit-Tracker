@@ -100,7 +100,18 @@ class TodayHabitsScreen extends StatelessWidget {
                                 strike: isDone,
                                 highlighted: !isDone,
                                 onTap: () {
-                                  context.read<HabitService>().add(ToggleHabit(habit.id, now));
+                                  if (habit.targetMinutes != null) {
+                                    final currentProgress = habit.getCompletionPercentage(now);
+                                    int nextProgress = (currentProgress + 25);
+                                    if (nextProgress > 100) nextProgress = 0;
+                                    
+                                    context.read<HabitService>().add(UpdateHabitPercentage(
+                                      habit.id,
+                                      {'${now.year}-${now.month}-${now.day}': nextProgress},
+                                    ));
+                                  } else {
+                                    context.read<HabitService>().add(ToggleHabit(habit.id, now));
+                                  }
                                 },
                               );
 
@@ -334,9 +345,9 @@ class _HabitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final streak = HabitStatisticsService.currentStreak(habit, DateTime.now());
-    final totalCompleted = habit.completedDates.length;
-    final goalProgress = (totalCompleted / habit.targetDays).clamp(0.0, 1.0);
+    final now = DateTime.now();
+    final streak = HabitStatisticsService.currentStreak(habit, now);
+    final dailyProgress = (habit.getCompletionPercentage(now) / 100.0).clamp(0.0, 1.0);
     
     // Icon mapping
     IconData getIcon(String name) {
@@ -365,169 +376,158 @@ class _HabitTile extends StatelessWidget {
       }
     }
 
-    final accentColor = habit.targetMinutes != null ? const Color(0xFF2196F3) : const Color(0xFF5BC8D3);
+    const appGreen = Color(0xFF95D878);
+    final accentColor = appGreen;
+    final iconBgColor = appGreen.withOpacity(0.15);
+    final bool isTimeBased = habit.targetMinutes != null;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.fromLTRB(0, 16, 16, 16),
+        width: double.infinity,
+        height: isTimeBased ? 110 : 84,
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E), // Dark grey as requested
-          borderRadius: BorderRadius.circular(24),
+          color: const Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white.withOpacity(0.05)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
         ),
-        child: Column(
+        child: Stack(
           children: [
-            Row(
-              children: [
-                // Left accent bar
-                Container(
-                  width: 4,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(4),
-                      bottomRight: Radius.circular(4),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                
-                // Icon Avatar
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF386B4D),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    getIcon(habit.iconName),
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                
-                // Text Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        habit.name,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          decoration: strike ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
-                      Text(
-                        habit.description.isNotEmpty 
-                            ? habit.description 
-                            : "${habit.repeatDays.length} days/week",
-                        style: const TextStyle(
-                          color: Color(0xFFA5D6A7),
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          if (habit.targetMinutes != null) ...[
-                            _SmallChip(text: "${habit.targetMinutes}min"),
-                            const SizedBox(width: 8),
-                          ],
-                          _SmallChip(text: "🔥 $streak days"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Action Indicator (Progress or Checkmark)
-                if (habit.targetMinutes != null)
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: CircularProgressIndicator(
-                          value: goalProgress,
-                          strokeWidth: 4,
-                          backgroundColor: Colors.white.withOpacity(0.1),
-                          valueColor: AlwaysStoppedAnimation(accentColor),
-                        ),
-                      ),
-                      Text(
-                        "${(goalProgress * 100).round()}%",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  _DailyCheckmark(done: done, color: accentColor),
-              ],
-            ),
-            if (habit.targetMinutes != null) ...[
-
-              const SizedBox(height: 16),
-              // Bottom Progress Bar with Arrow
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [
-                    Container(
-                      height: 2,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final progressWidth = constraints.maxWidth * goalProgress;
-                        return Row(
-                          children: [
-                            Container(
-                              height: 2,
-                              width: (progressWidth - 10).clamp(0, constraints.maxWidth),
-                              decoration: BoxDecoration(
-                                color: accentColor,
-                                borderRadius: BorderRadius.circular(1),
-                              ),
-                            ),
-                            if (goalProgress > 0)
-                              Icon(
-                                Icons.play_arrow,
-                                size: 14,
-                                color: accentColor,
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
+            // Left accent bar
+            Positioned(
+              left: 14,
+              top: 16,
+              child: Container(
+                width: 3,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ],
+            ),
+
+            // Icon Avatar
+            Positioned(
+              left: 24,
+              top: 18,
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF2A2A2A),
+                  border: Border.all(color: appGreen.withOpacity(0.1)),
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  getIcon(habit.iconName),
+                  color: appGreen,
+                  size: 22,
+                ),
+              ),
+            ),
+
+            // Title
+            Positioned(
+              left: 82,
+              top: 15,
+              child: Text(
+                habit.name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  decoration: strike ? TextDecoration.lineThrough : null,
+                ),
+              ),
+            ),
+
+            // Subtitle
+            Positioned(
+              left: 82,
+              top: 34,
+              child: Text(
+                isTimeBased
+                    ? "${(habit.targetMinutes! * dailyProgress).round()} / ${habit.targetMinutes} min"
+                    : (habit.description.isNotEmpty
+                        ? habit.description
+                        : "${habit.repeatDays.length} days/week"),
+                style: const TextStyle(
+                  color: Color(0xFFC8EEC0),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+
+            // Tags
+            Positioned(
+              left: 82,
+              top: 54,
+              child: Row(
+                children: [
+                  if (habit.targetMinutes != null) ...[
+                    _Tag(text: "${habit.targetMinutes}min", width: 68),
+                    const SizedBox(width: 8),
+                  ],
+                  _Tag(text: "🔥 $streak days", width: 66),
+                ],
+              ),
+            ),
+
+            // Action Indicator
+            Positioned(
+              right: 24,
+              top: 26,
+              child: isTimeBased
+                  ? _ProgressCircle(progress: dailyProgress, color: accentColor)
+                  : _DailyCheckmark(done: done, color: accentColor),
+            ),
+
+            // Bottom Progress Bar (for time-based)
+            if (isTimeBased)
+              Positioned(
+                left: 29,
+                top: 65, // Moved up more to 65
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragUpdate: (details) {
+                    const double barWidth = 292;
+                    double newProgress = (details.localPosition.dx / barWidth).clamp(0.0, 1.0);
+                    context.read<HabitService>().add(UpdateHabitPercentage(
+                      habit.id,
+                      {'${now.year}-${now.month}-${now.day}': (newProgress * 100).round()},
+                    ));
+                  },
+                  onTapDown: (details) {
+                    const double barWidth = 292;
+                    double newProgress = (details.localPosition.dx / barWidth).clamp(0.0, 1.0);
+                    context.read<HabitService>().add(UpdateHabitPercentage(
+                      habit.id,
+                      {'${now.year}-${now.month}-${now.day}': (newProgress * 100).round()},
+                    ));
+                  },
+                  child: Container(
+                    width: 292,
+                    height: 45, // Further increased hit area
+                    color: Colors.transparent,
+                    child: Center(
+                      child: SizedBox(
+                        width: 292,
+                        height: 4,
+                        child: CustomPaint(
+                          painter: _BottomProgressPainter(
+                            progress: dailyProgress,
+                            color: accentColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -535,26 +535,61 @@ class _HabitTile extends StatelessWidget {
   }
 }
 
+class _ProgressCircle extends StatelessWidget {
+  final double progress;
+  final Color color;
+  const _ProgressCircle({required this.progress, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          width: 32,
+          height: 32,
+          child: CircularProgressIndicator(
+            value: progress,
+            strokeWidth: 2,
+            backgroundColor: Colors.white.withOpacity(0.06),
+            valueColor: AlwaysStoppedAnimation(color),
+          ),
+        ),
+        Text(
+          "${(progress * 100).round()}%",
+          style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+}
 
 
 
-class _SmallChip extends StatelessWidget {
+
+class _Tag extends StatelessWidget {
   final String text;
-  const _SmallChip({required this.text});
+  final double width;
+  const _Tag({required this.text, required this.width});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      width: width,
+      height: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.white.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         text,
+        maxLines: 1,
         style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
+          color: Color(0xFFC8EEC0),
+          fontSize: 9,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
@@ -569,21 +604,73 @@ class _DailyCheckmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 44,
-      height: 44,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: done ? color : Colors.transparent,
+        color: done ? color : Colors.white.withOpacity(0.06),
         border: Border.all(
-          color: done ? color : color.withOpacity(0.3),
-          width: 2,
+          color: done ? color : color.withOpacity(0.65),
+          width: 1.4,
         ),
       ),
-      child: Icon(
-        Icons.check,
-        color: done ? Colors.black : Colors.white.withOpacity(0.1),
-        size: 24,
-      ),
+      child: done
+          ? const Icon(
+              Icons.check,
+              color: Colors.black,
+              size: 18,
+            )
+          : null,
     );
+  }
+}
+
+class _BottomProgressPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  const _BottomProgressPainter({
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double padding = 10.0;
+    final double usableWidth = size.width - (padding * 2);
+    final double progressX = padding + (usableWidth * progress);
+    final double y = 10; // 85 (container top) + 10 = 95 (new bottom position)
+
+    final trackPaint = Paint()
+      ..color = Colors.white.withOpacity(0.1)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    final progressPaint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    // Draw track
+    canvas.drawLine(Offset(padding, y), Offset(size.width - padding, y), trackPaint);
+    
+    // Draw progress line
+    if (progress > 0) {
+      canvas.drawLine(Offset(padding, y), Offset(progressX, y), progressPaint);
+
+      // Restore original right-pointing arrow centered on the line
+      final arrowPath = Path()
+        ..moveTo(progressX + 10, y)
+        ..lineTo(progressX - 2, y - 6)
+        ..lineTo(progressX - 2, y + 6)
+        ..close();
+
+      canvas.drawPath(arrowPath, progressPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BottomProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }

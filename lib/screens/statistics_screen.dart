@@ -410,7 +410,7 @@ class _VolumeCard extends StatelessWidget {
           ]),
           const SizedBox(height: 16),
           SizedBox(
-            height: 160,
+            height: 180,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,

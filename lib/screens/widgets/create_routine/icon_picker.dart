@@ -16,66 +16,55 @@ class IconPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final colorScheme = theme.colorScheme;
+    const Color appGreen = Color(0xFF95D878);
     final primaryColor = Color(selectedColor);
-    final cardColor = isDark
-        ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-        : Colors.white;
-    final borderColor = isDark ? Colors.white10 : Colors.grey[200]!;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        childAspectRatio: 1,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            childAspectRatio: 1,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: icons.length,
-          itemBuilder: (context, index) {
-            final iconData = icons[index];
-            final name = iconData['name'] as String;
-            final isSelected = name == selectedIconName;
+      itemCount: icons.length,
+      itemBuilder: (context, index) {
+        final iconData = icons[index];
+        final name = iconData['name'] as String;
+        final isSelected = name == selectedIconName;
 
-            return GestureDetector(
-              onTap: () => onIconSelected(name),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? primaryColor.withOpacity(0.1)
-                      : (isDark
-                            ? colorScheme.surface
-                            : Colors.grey[50]!.withOpacity(0.5)),
-                  border: Border.all(
-                    color: isSelected ? primaryColor : Colors.transparent,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  iconData['icon'] as IconData,
-                  size: 24,
-                  color: isSelected
-                      ? primaryColor
-                      : colorScheme.onSurface.withOpacity(0.3),
-                ),
+        return GestureDetector(
+          onTap: () => onIconSelected(name),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? primaryColor.withOpacity(0.15)
+                  : Colors.white.withOpacity(0.03),
+              border: Border.all(
+                color: isSelected ? primaryColor : Colors.white.withOpacity(0.08),
+                width: isSelected ? 2 : 1,
               ),
-            );
-          },
-        ),
-      ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.2),
+                        blurRadius: 8,
+                      )
+                    ]
+                  : [],
+            ),
+            child: Icon(
+              iconData['icon'] as IconData,
+              size: 22,
+              color: isSelected ? appGreen : Colors.white.withOpacity(0.4),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -16,37 +16,34 @@ class RepeatDaysSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final colorScheme = theme.colorScheme;
     final primaryColor = Color(selectedColor);
-    final borderColor = isDark ? Colors.white10 : Colors.grey[200]!;
+    final Color borderColor = Colors.white.withOpacity(0.1);
 
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 8,
+      runSpacing: 8,
       children: weekdays.map((day) {
         final isSelected = selectedRepeatDays.contains(day);
 
         return GestureDetector(
           onTap: () => onDayToggled(day),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: isSelected
-                  ? primaryColor
-                  : (isDark ? colorScheme.surfaceContainer : Colors.white),
-              borderRadius: BorderRadius.circular(12),
+                  ? primaryColor.withOpacity(0.2)
+                  : Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isSelected ? primaryColor : borderColor,
+                width: isSelected ? 1.5 : 1,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: primaryColor.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                        color: primaryColor.withOpacity(0.15),
+                        blurRadius: 10,
                       ),
                     ]
                   : [],
@@ -54,8 +51,9 @@ class RepeatDaysSelector extends StatelessWidget {
             child: Text(
               day,
               style: TextStyle(
-                color: isSelected ? Colors.white : colorScheme.onSurface,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Colors.white : Colors.white.withOpacity(0.4),
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ),

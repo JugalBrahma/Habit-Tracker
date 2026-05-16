@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/auth_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ForestOnboardingFlow extends StatefulWidget {
@@ -37,26 +38,17 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          GestureDetector(
-            onTap: () {
-              if (_index > 0) {
-                _controller.previousPage(
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeOut,
-                );
-              }
-            },
-            child: const Icon(Icons.arrow_back, color: _accent, size: 20),
-          ),
           GestureDetector(
             onTap: () {
               if (widget.onComplete != null) {
                 widget.onComplete!();
               }
             },
-            child: const Text("Skip", style: TextStyle(color: _accent, fontSize: 12, fontWeight: FontWeight.w600)),
+            child: const Text("Skip",
+                style: TextStyle(
+                    color: _accent, fontSize: 14, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -104,8 +96,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
   Widget _screen2() {
     return Column(
       children: [
-        _header(),
-        const SizedBox(height: 24),
+        const SizedBox(height: 72), // Fixed space for sticky skip
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
@@ -160,13 +151,11 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
           ),
         ),
         const Spacer(),
-        _dots(),
-        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: _primaryButton("Continue Journey", _next),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 58), // Increased space for fixed dots
       ],
     );
   }
@@ -174,8 +163,7 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
   Widget _screen3() {
     return Column(
       children: [
-        _header(),
-        const SizedBox(height: 60),
+        const SizedBox(height: 84), // Fixed space for sticky skip
         Container(
           width: 256,
           height: 256,
@@ -203,13 +191,11 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
           ),
         ),
         const Spacer(),
-        _dots(),
-        const SizedBox(height: 24),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: _primaryButton("Next ›", _next),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 58), // Increased space for fixed dots
       ],
     );
   }
@@ -217,41 +203,51 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
   Widget _screen4() {
     return Stack(
       children: [
+
         Positioned.fill(
-          child: Image.network(
-            "https://www.figma.com/api/mcp/asset/684ea8e3-abaa-4ece-9c73-a65b35d6f3fc",
-            fit: BoxFit.cover,
-            color: Colors.black.withOpacity(.55),
-            colorBlendMode: BlendMode.darken,
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF1B2B21), // Dark Forest
+                  _bg,
+                ],
+              ),
+            ),
           ),
         ),
         Positioned.fill(
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: Alignment(0, -0.2),
-                radius: 1.1,
-                colors: [Color(0x263E7B27), Color(0xF5131313)],
+                center: const Alignment(0, -0.2),
+                radius: 1.2,
+                colors: [_accent.withOpacity(0.05), Colors.transparent],
               ),
             ),
           ),
         ),
         Column(
           children: [
-            _header(),
-            const SizedBox(height: 84),
+            const SizedBox(height: 108), // Fixed space for sticky skip
             Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
                 color: _accentDark,
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: _accent.withOpacity(.25), blurRadius: 24)],
+                boxShadow: [
+                  BoxShadow(color: _accent.withOpacity(.25), blurRadius: 24)
+                ],
               ),
               child: const Icon(Icons.eco, color: _accent, size: 36),
             ),
             const SizedBox(height: 24),
-            const Text("Ready to Grow?", style: TextStyle(color: _text, fontSize: 48, fontWeight: FontWeight.w700)),
+            const Text("Ready to Grow?",
+                style: TextStyle(
+                    color: _text, fontSize: 42, fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
@@ -261,84 +257,65 @@ class _ForestOnboardingFlowState extends State<ForestOnboardingFlow> {
                 style: TextStyle(color: _muted, fontSize: 16, height: 1.5),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  _FeatureTile(icon: Icons.bolt, title: "Momentum", subtitle: "Deep progress, minimal noise."),
+                  _FeatureTile(
+                      icon: Icons.bolt,
+                      title: "Momentum",
+                      subtitle: "Deep progress, minimal noise."),
                   SizedBox(height: 16),
-                  _FeatureTile(icon: Icons.query_stats, title: "Precision", subtitle: "Quantified journey visualized."),
+                  _FeatureTile(
+                      icon: Icons.query_stats,
+                      title: "Precision",
+                      subtitle: "Quantified journey visualized."),
                 ],
               ),
             ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _primaryButton("Get Started", () {
-                if (widget.onComplete != null) {
-                  widget.onComplete!();
-                }
+              child: _primaryButton("Sign up", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
+                );
               }),
             ),
-            const SizedBox(height: 14),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black87,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                    ),
-                    onPressed: () {
-                      // TODO: Navigate to signup
-                      print('Navigate to signup');
-                    },
-                    child: const Text("Sign up", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white, width: 1),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () {
-                      // TODO: Navigate to login
-                      print('Navigate to login');
-                    },
-                    child: const Text("Log in", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _dots(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 72), // Space for fixed dots
           ],
         ),
       ],
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bg,
       body: SafeArea(
-        child: PageView(
-          controller: _controller,
-          onPageChanged: (i) => setState(() => _index = i),
-          children: [_screen2(), _screen3(), _screen4()],
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            PageView(
+              controller: _controller,
+              onPageChanged: (i) => setState(() => _index = i),
+              children: [_screen2(), _screen3(), _screen4()],
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _header(),
+            ),
+            Positioned(
+              bottom: 24,
+              child: _dots(),
+            ),
+          ],
         ),
       ),
     );

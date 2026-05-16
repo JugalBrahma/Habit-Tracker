@@ -6,6 +6,7 @@ import 'package:habit_tracker/service/model/user_model.dart';
 import 'package:habit_tracker/screens/create_routine.dart';
 import 'package:habit_tracker/screens/update_habit.dart';
 import 'package:habit_tracker/service/repositery/statistics_service.dart';
+import 'package:habit_tracker/service/bloc/habit_events.dart';
 
 class HabitLibraryScreen extends StatelessWidget {
   const HabitLibraryScreen({super.key});
@@ -215,87 +216,196 @@ class _HabitCard extends StatelessWidget {
     final goalProgress = (totalCompleted / habit.targetDays).clamp(0.0, 1.0);
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => UpdateHabitPage(habit: habit)),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: HabitLibraryScreen.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: HabitLibraryScreen.border),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(habit.name,
-                      style: const TextStyle(
-                          color: HabitLibraryScreen.title, fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Row(children: [
-                    const Icon(Icons.event_note_outlined, size: 14, color: HabitLibraryScreen.muted),
-                    const SizedBox(width: 4),
-                    Text(habit.repeatDays.join(', '),
-                        style: const TextStyle(color: HabitLibraryScreen.muted, fontSize: 14)),
-                  ]),
-                ]),
-              ),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color.fromRGBO(65, 73, 60, 0.3)),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => UpdateHabitPage(habit: habit)),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: HabitLibraryScreen.card,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: HabitLibraryScreen.border),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(habit.name,
+                                    style: const TextStyle(
+                                        color: HabitLibraryScreen.title,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 4),
+                                Row(children: [
+                                  const Icon(Icons.event_note_outlined,
+                                      size: 14,
+                                      color: HabitLibraryScreen.muted),
+                                  const SizedBox(width: 4),
+                                  Text(habit.repeatDays.join(', '),
+                                      style: const TextStyle(
+                                          color: HabitLibraryScreen.muted,
+                                          fontSize: 14)),
+                                ]),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 80),
+                        ]),
+                    const SizedBox(height: 20),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Goal Progress",
+                                  style: TextStyle(
+                                      color: HabitLibraryScreen.muted,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                              Text("$totalCompleted / ${habit.targetDays} Days",
+                                  style: const TextStyle(
+                                      color: HabitLibraryScreen.title,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text("Current Streak",
+                                  style: TextStyle(
+                                      color: HabitLibraryScreen.muted,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                              Text("$streak Days",
+                                  style: TextStyle(
+                                      color: streak > 0
+                                          ? HabitLibraryScreen.accent
+                                          : HabitLibraryScreen.muted,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ]),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        minHeight: 6,
+                        value: goalProgress.isFinite ? goalProgress : 0.0,
+                        backgroundColor: const Color(0xFF353534),
+                        valueColor: const AlwaysStoppedAnimation(
+                            HabitLibraryScreen.accent),
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Icon(Icons.spa_outlined, size: 16, color: HabitLibraryScreen.accent),
               ),
-            ]),
-            const SizedBox(height: 20),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Goal Progress",
-                      style: TextStyle(
-                          color: HabitLibraryScreen.muted, fontSize: 12, fontWeight: FontWeight.w600)),
-                  Text("$totalCompleted / ${habit.targetDays} Days",
-                      style: const TextStyle(
-                          color: HabitLibraryScreen.title, fontSize: 14, fontWeight: FontWeight.w700)),
-                ],
+              Positioned(
+                top: 12,
+                right: 52,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2A2A),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: const Color.fromRGBO(65, 73, 60, 0.3)),
+                  ),
+                  child: const Icon(Icons.spa_outlined,
+                      size: 16, color: HabitLibraryScreen.accent),
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text("Current Streak",
-                      style: TextStyle(
-                          color: HabitLibraryScreen.muted, fontSize: 12, fontWeight: FontWeight.w600)),
-                  Text("$streak Days",
-                      style: TextStyle(
-                          color: streak > 0 ? HabitLibraryScreen.accent : HabitLibraryScreen.muted,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700)),
-                ],
+              Positioned(
+                top: 4,
+                right: 4,
+                child: PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert,
+                      size: 20, color: HabitLibraryScreen.muted),
+                  color: HabitLibraryScreen.card,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: HabitLibraryScreen.border),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      _showDeleteDialog(context, habit);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline,
+                              size: 18, color: Color(0xFFFFB4AB)),
+                          SizedBox(width: 10),
+                          Text('Delete',
+                              style: TextStyle(color: Color(0xFFFFB4AB))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ]),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                minHeight: 6,
-                value: goalProgress.isFinite ? goalProgress : 0.0,
-                backgroundColor: const Color(0xFF353534),
-                valueColor: const AlwaysStoppedAnimation(HabitLibraryScreen.accent),
-              ),
+            ],
+          ),
+        ));
+  }
+
+  void _showDeleteDialog(BuildContext context, Habit habit) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: HabitLibraryScreen.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: HabitLibraryScreen.border),
+          ),
+          title: Text("Delete Habit?",
+              style: TextStyle(
+                  color: HabitLibraryScreen.title,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600)),
+          content: Text(
+            "Are you sure you want to remove '${habit.name}'? This action cannot be undone.",
+            style: const TextStyle(color: HabitLibraryScreen.muted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel",
+                  style: TextStyle(color: HabitLibraryScreen.muted)),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<HabitService>().add(DeleteHabit(habit.id));
+                Navigator.pop(context);
+              },
+              child: const Text("Delete",
+                  style: TextStyle(
+                      color: Color(0xFFFFB4AB), fontWeight: FontWeight.bold)),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
